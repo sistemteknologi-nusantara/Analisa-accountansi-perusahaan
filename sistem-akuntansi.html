@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Akuntansi Nusantara</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif;}
+        body {background:#f8fafc; padding:15px; max-width:1000px; margin:0 auto;}
+        .header {background:linear-gradient(135deg,#0f172a,#1e40af); color:white; padding:22px; border-radius:14px; text-align:center; margin-bottom:20px;}
+        .tab-menu {display:flex; gap:8px; margin-bottom:15px; overflow-x:auto; padding-bottom:5px;}
+        .tab-btn {padding:12px 18px; border:none; border-radius:8px; background:#e2e8f0; cursor:pointer; font-weight:600; white-space:nowrap;}
+        .tab-btn.active {background:#1e40af; color:white;}
+        .konten-tab {display:none;}
+        .konten-tab.aktif {display:block;}
+        .form-input {background:white; padding:18px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,0.08); margin-bottom:18px;}
+        .grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(170px,1fr)); gap:12px; margin-bottom:12px;}
+        input, select, button {padding:11px; border:1px solid #cbd5e1; border-radius:8px; font-size:15px; width:100%;}
+        button {background:#165DFF; color:white; border:none; font-weight:600; cursor:pointer;}
+        button.hijau {background:#059669;}
+        button.merah {background:#dc2626;}
+        button.oranye {background:#d97706;}
+        .ringkasan {display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:15px; margin-bottom:18px;}
+        .kotak {background:white; padding:18px; border-radius:12px; text-align:center; box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+        .nilai {font-size:24px; font-weight:900; margin-top:8px;}
+        .hijau {color:#059669;}
+        .merah {color:#ef4444;}
+        .biru {color:#1e40af;}
+        .kuning {color:#d97706;}
+        table {width:100%; background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.08); border-collapse:collapse; margin-bottom:15px;}
+        th {background:#0f172a; color:white; padding:13px; text-align:left;}
+        td {padding:11px; border-bottom:1px solid #e2e8f0;}
+        .laporan {background:white; padding:25px; border-radius:12px; line-height:1.8;}
+        .garis-bawah {border-bottom:2px solid #000; padding-bottom:8px; margin:10px 0;}
+        .kanan {text-align:right;}
+        .tengah {text-align:center;}
+
+        /* Tambahan gaya untuk halaman pajak */
+        .halaman {display:none; padding:15px;}
+        .halaman.tampil {display:block;}
+        .kepala-laporan {text-align:center; border-bottom:2px solid #6d28d9; padding-bottom:20px; margin-bottom:20px;}
+        .bagian-laporan {background:white; padding:20px; border-radius:12px; margin-bottom:15px;}
+        .tombol {padding:10px 15px; border:none; border-radius:8px; font-weight:bold; cursor:pointer;}
+        .lingkaran {width:100px; height:100px; border-radius:50%; border:6px solid #10b981; color:#10b981; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; margin:15px auto;}
+        .lingkaran.siaga {border-color:#f59e0b; color:#f59e0b;}
+        .lingkaran.bahaya {border-color:#ef4444; color:#ef4444; animation:kedip 1s infinite;}
+        @keyframes kedip {0%{opacity:1;}50%{opacity:0.5;}100%{opacity:1;}}
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📒 SISTEM AKUNTANSI & PAJAK LENGKAP</h1>
+    <p>Standar Pembukuan • Jurnal • Buku Besar • Laporan Keuangan • Kepatuhan Pajak</p>
+</div>
+
+<div class="tab-menu">
+    <button class="tab-btn active" onclick="bukaTab('jurnal')">📝 Jurnal Umum</button>
+    <button class="tab-btn" onclick="bukaTab('bukubesar')">📂 Buku Besar</button>
+    <button class="tab-btn" onclick="bukaTab('neracasaldo')">⚖️ Neraca Saldo</button>
+    <button class="tab-btn" onclick="bukaTab('labarugi')">📉 Laba Rugi</button>
+    <button class="tab-btn" onclick="bukaTab('neraca')">📑 Neraca</button>
+    <button class="tab-btn" onclick="bukaTab('akuntansi')">📑 Aset & Pajak</button>
+    <button class="tab-btn" onclick="bukaTab('data')">💾 Data & File</button>
+</div>
+
+<!-- ============================================== -->
+<div id="jurnal" class="konten-tab aktif">
+    <div class="form-input">
+        <h3 style="margin-bottom:12px;">Input Transaksi Jurnal Umum</h3>
+        <div class="grid">
+            <input type="date" id="tanggal">
+            <select id="akun">
+                <option value="">Pilih Akun</option>
+                <option value="Kas">Kas</option>
+                <option value="Piutang Usaha">Piutang Usaha</option>
+                <option value="Persediaan Barang">Persediaan Barang</option>
+                <option value="Peralatan">Peralatan</option>
+                <option value="Utang Usaha">Utang Usaha</option>
+                <option value="Modal">Modal</option>
+                <option value="Pendapatan">Pendapatan</option>
+                <option value="Beban Gaji">Beban Gaji</option>
+                <option value="Beban Listrik">Beban Listrik</option>
+                <option value="Beban Sewa">Beban Sewa</option>
+                <option value="Beban Lainnya">Beban Lainnya</option>
+            </select>
+            <select id="posisi">
+                <option value="debit">Debit</option>
+                <option value="kredit">Kredit</option>
+            </select>
+            <input type="number" id="jumlah" placeholder="Jumlah Rp." min="0">
+        </div>
+        <input type="text" id="keterangan" placeholder="Keterangan Transaksi" style="margin-bottom:12px;">
+        <button onclick="tambahJurnal()">✅ Catat ke Jurnal</button>
+    </div>
+
+    <h3 style="margin-bottom:10px;">JURNAL UMUM</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Tanggal</th>
+                <th>Nama Akun</th>
+                <th>Keterangan</th>
+                <th class="kanan">Debit (Rp)</th>
+                <th class="kanan">Kredit (Rp)</th>
+            </tr>
+        </thead>
+        <tbody id="daftar_jurnal"></tbody>
+        <tfoot>
+            <tr style="font-weight:bold; background:#f1f5f9;">
+                <td colspan="3" class="kanan">TOTAL</td>
+                <td class="kanan" id="total_debit">0</td>
+                <td class="kanan" id="total_kredit">0</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- ============================================== -->
+<div id="bukubesar" class="konten-tab">
+    <h3 style="margin-bottom:10px;">BUKU BESAR</h3>
+    <select id="pilih_akun_besar" onchange="tampilBukuBesar()" style="margin-bottom:12px; max-width:300px;">
+        <option value="">-- Pilih Akun --</option>
+    </select>
+    <table id="tabel_buku_besar"></table>
+</div>
+
+<!-- ============================================== -->
+<div id="neracasaldo" class="konten-tab">
+    <h3 style="margin-bottom:10px;">NERACA SALDO</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Akun</th>
+                <th class="kanan">Debit (Rp)</th>
+                <th class="kanan">Kredit (Rp)</th>
+            </tr>
+        </thead>
+        <tbody id="isi_neraca_saldo"></tbody>
+        <tfoot>
+            <tr style="font-weight:bold; background:#f1f5f9;">
+                <td>TOTAL</td>
+                <td class="kanan" id="ns_debit">0</td>
+                <td class="kanan" id="ns_kredit">0</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<!-- ============================================== -->
+<div id="labarugi" class="konten-tab">
+    <div class="laporan">
+        <h2 class="tengah">LAPORAN LABA RUGI</h2>
+        <p class="tengah">Periode: <span id="periode_laporan">---</span></p>
+        <div class="garis-bawah"></div>
+        
+        <p><strong>Pendapatan:</strong></p>
+        <p style="padding-left:20px;">Pendapatan Usaha <span class="kanan" id="pendapatan">0</span></p>
+        <p style="padding-left:20px; font-weight:bold;">Total Pendapatan <span class="kanan" id="total_pendapatan">0</span></p>
+        <br>
+        <p><strong>Beban-beban:</strong></p>
+        <p style="padding-left:20px;">Beban Gaji <span class="kanan" id="beban_gaji">0</span></p>
+        <p style="padding-left:20px;">Beban Listrik <span class="kanan" id="beban_listrik">0</span></p>
+        <p style="padding-left:20px;">Beban Sewa <span class="kanan" id="beban_sewa">0</span></p>
+        <p style="padding-left:20px;">Beban Lainnya <span class="kanan" id="beban_lain">0</span></p>
+        <p style="padding-left:20px; font-weight:bold;">Total Beban <span class="kanan" id="total_beban">0</span></p>
+        <div class="garis-bawah"></div>
+        <p style="font-size:18px; font-weight:bold;">LABA / RUGI BERSIH <span class="kanan" id="laba_rugi">0</span></p>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<div id="neraca" class="konten-tab">
+    <div class="laporan">
+        <h2 class="tengah">NERACA</h2>
+        <p class="tengah">Per <span id="tanggal_neraca">---</span></p>
+        <div class="garis-bawah"></div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
+            <div>
+                <h3>ASET</h3>
+                <p>Kas <span class="kanan" id="aset_kas">0</span></p>
+                <p>Piutang Usaha <span class="kanan" id="aset_piutang">0</span></p>
+                <p>Persediaan Barang <span class="kanan" id="aset_persediaan">0</span></p>
+                <p>Peralatan <span class="kanan" id="aset_peralatan">0</span></p>
+                <div class="garis-bawah"></div>
+                <p style="font-weight:bold;">TOTAL ASET <span class="kanan" id="total_aset_neraca">0</span></p>
+            </div>
+            <div>
+                <h3>KEWAJIBAN & EKUITAS</h3>
+                <p>Utang Usaha <span class="kanan" id="utang">0</span></p>
+                <p>Modal <span class="kanan" id="modal">0</span></p>
+                <p>Laba Ditahan <span class="kanan" id="laba_ditahan">0</span></p>
+                <div class="garis-bawah"></div>
+                <p style="font-weight:bold;">TOTAL PASIVA <span class="kanan" id="total_pasiva">0</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<div id="akuntansi" class="konten-tab">
+    <div class="kepala-laporan">
+        <h1>📑 SISTEM AKUNTANSI & KEPATUHAN PAJAK</h1>
+        <p style="margin-top:8px;">PT. SISTEM TEKNOLOGI NUSANTARA</p>
+        <p style="margin-top:5px;">Standar: PSAK & Peraturan Perpajakan Indonesia</p>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
+        <button class="tombol biru" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('aset')">💻 Aset Tetap</button>
+        <button class="tombol oranye" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('biaya')">💸 Biaya Operasional</button>
+        <button class="tombol ungu" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('penyusutan')">📉 Penyusutan</button>
+        <button class="tombol hijau" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('pajak')">🧾 Laporan Pajak</button>
+    </div>
+
+    <div id="bagian-aset" class="bagian-laporan">
+        <h3 style="color:#1d4ed8; margin-bottom:12px;">💻 DAFTAR ASET TETAP</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode Aset</th>
+                    <th>Nama Barang</th>
+                    <th>Tanggal Perolehan</th>
+                    <th>Nilai Perolehan (Rp)</th>
+                    <th>Masa Manfaat</th>
+                    <th>Kategori Pajak</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_aset"></tbody>
+        </table>
+    </div>
+
+    <div id="bagian-biaya" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#ea580c; margin-bottom:12px;">💸 REKAP BIAYA OPERASIONAL</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Jenis Biaya</th>
+                    <th>Keterangan</th>
+                    <th>Jumlah (Rp)</th>
+                    <th>Akun Pajak</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_biaya"></tbody>
+        </table>
+    </div>
+
+    <div id="bagian-penyusutan" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#7c3aed; margin-bottom:12px;">📉 PERHITUNGAN PENYUSUTAN</h3>
+        <p style="margin-bottom:10px;">* Menurut Aturan Pajak: Metode Garis Lurus</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode Aset</th>
+                    <th>Nilai Perolehan</th>
+                    <th>Nilai Sisa</th>
+                    <th>Penyusutan Tahunan</th>
+                    <th>Akumulasi Penyusutan</th>
+                    <th>Nilai Buku</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_penyusutan"></tbody>
+        </table>
+    </div>
+
+    <div id="bagian-pajak" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#059669; margin-bottom:12px;">🧾 RINGKASAN UNTUK PELAPORAN PAJAK</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-bottom:15px;">
+            <div class="kotak" style="background:#ecfdf5;">
+                <p>Total Aset Tetap</p>
+                <div class="angka hijau" id="total_aset">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#fff7ed;">
+                <p>Total Biaya Dikurangkan</p>
+                <div class="angka oranye" id="total_biaya">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#f5f3ff;">
+                <p>Total Penyusutan</p>
+                <div class="angka ungu" id="total_penyusutan">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#fef3c7;">
+                <p>Estimasi PPh Badan</p>
+                <div class="angka kuning" id="estimasi_pph">Rp 0</div>
+            </div>
+        </div>
+        <div style="background:#f8fafc; padding:15px; border-radius:10px;">
+            <h4>📝 Catatan Konsultasi Pajak:</h4>
+            <ul style="margin:10px 0 0 20px; line-height:1.7;">
+                <li>Kategori aset sesuai Pasal 11 UU PPh</li>
+                <li>Masa manfaat: Kelompok II = 4 Tahun, Kelompok III = 8 Tahun</li>
+                <li>Penyusutan dihitung setelah aset digunakan</li>
+                <li>Semua bukti pencatatan dapat dijadikan lampiran laporan pajak</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================== -->
+<div id="data" class="konten-tab">
+    <div class="form-input">
+        <h3>Pengelolaan Data</h3>
+        <div class="grid" style="margin-top:12px;">
+            <button class="hijau" onclick="simpanData()">💾 Simpan Data Permanen</button>
+            <button class="biru" onclick="eksporExcel()">📊 Ekspor ke Excel</button>
+            <button class="oranye" onclick="window.print()">🖨️ Cetak Laporan</button>
+            <button class="merah" onclick="if(confirm('Yakin hapus semua data?')){dataJurnal=[]; simpanData(); muatUlang();}">🗑️ Hapus Semua</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let dataJurnal = [];
+document.getElementById('tanggal').valueAsDate = new Date();
+
+function formatRupiah(angka) {
+    return 'Rp ' + parseFloat(angka||0).toLocaleString('id-ID');
+}
+
+function bukaTab(id) {
+    document.querySelectorAll('.konten-tab').forEach(e=>e.classList.remove('aktif'));
+    document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active'));
+    document.getElementById(id).classList.add('aktif');
+    event.target.classList.add('active');
+    if(id=='bukubesar') isiPilihanAkun();
+    if(id=='akuntansi') inisialisasiDataAkuntansi();
+    muatUlang();
+}
+
+function tambahJurnal() {
+    const tgl = document.getElementById('tanggal').value;
+    const akun = document.getElementById('akun').value;
+    const ket = document.getElementById('keterangan').value;
+    const posisi = document.getElementById('posisi').value;
+    const jumlah = parseInt(document.getElementById('jumlah').value);
+    
+    if(!tgl||!akun||!jumlah) return alert('Lengkapi data!');
+    
+    dataJurnal.push({tgl, akun, ket, posisi, jumlah});
+    document.getElementById('keterangan').value='';
+    document.getElementById('jumlah').value='';
+    simpanData();
+    muatUlang();
+}
+
+function muatUlang() {
+    let totalD=0, totalK=0;
+    let html='';
+    dataJurnal.forEach(trs=>{
+        html += `<tr>
+            <td>${trs.tgl}</td>
+            <td>${trs.akun}</td>
+            <td>${trs.ket}</td>
+            <td class="kanan">${trs.posisi=='debit'?formatRupiah(trs.jumlah):'-'}</td>
+            <td class="kanan">${trs.posisi=='kredit'?formatRupiah(trs.jumlah):'-'}</td>
+        </tr>`;
+        if(trs.posisi=='debit') totalD += trs.jumlah;
+        else totalK += trs.jumlah;
+    });
+    document.getElementById('daftar_jurnal').innerHTML = html||'<tr><td colspan="5" class="tengah">Belum ada transaksi</td></tr>';
+    document.getElementById('total_debit').innerText = formatRupiah(totalD);
+    document.getElementById('total_kredit').innerText = formatRupiah(totalK);
+    
+    hitungNeracaSaldo(); hitungLabaRugi(); hitungNeraca();
+}
+
+function isiPilihanAkun() {
+    let daftar = [...new Set(dataJurnal.map(x=>x.akun))];
+    let html='<option value="">-- Pilih Akun --</option>';
+    daftar.forEach(a=>html += `<option value="${a}">${a}</option>`);
+    document.getElementById('pilih_akun_besar').innerHTML = html;
+}
+
+function tampilBukuBesar() {
+    const akun = document.getElementById('pilih_akun_besar').value;
+    if(!akun) return document.getElementById('tabel_buku_besar').innerHTML='';
+    let saldo=0, html='<thead><tr><th>Tanggal</th><th>Keterangan</th><th class="kanan">Debit</th><th class="kanan">Kredit</th><th class="kanan">Saldo</th></tr></thead><tbody>';
+    dataJurnal.filter(x=>x.akun==akun).forEach(trs=>{
+        if(trs.posisi=='debit') saldo += trs.jumlah; else saldo -= trs.jumlah;
+        html += `<tr>
+            <td>${trs.tgl}</td><td>${trs.ket}</td>
+            <td class="kanan">${trs.posisi=='debit'?formatRupiah(trs.jumlah):'-'}</td>
+            <td class="kanan">${trs.posisi=='kredit'?formatRupiah(trs.jumlah):'-'}</td>
+            <td class="kanan">${formatRupiah(saldo)}</td>
+        </tr>`;
+    });
+    html += `</tbody><tfoot><tr style="font-weight:bold;"><td colspan="4">Saldo Akhir</td><td class="kanan">${formatRupiah(saldo)}</td></tr></tfoot>`;
+    document.getElementById('tabel_buku_besar').innerHTML = html;
+}
+
+function hitungNeracaSaldo() {
+    let akun = {};
+    dataJurnal.forEach(trs=>{
+        if(!akun[trs.akun]) akun[trs.akun] = {debit:0, kredit:0};
+        if(trs.posisi=='debit') akun[trs.akun].debit += trs.jumlah;
+        else akun[trs.akun].kredit += trs.jumlah;
+    });
+    let totalD=0, totalK=0, html='';
+    for(let a in akun){
+        let saldoD = akun[a].debit - akun[a].kredit;
+        let saldoK = akun[a].kredit - akun[a].debit;
+        let d = saldoD>0?saldoD:0;
+        let k = saldoK>0?saldoK:0;
+        totalD += d; totalK += k;
+        html += `<tr><td>${a}</td><td class="kanan">${formatRupiah(d)}</td><td class="kanan">${formatRupiah(k)}</td></tr>`;
+    }
+    document.getElementById('isi_neraca_saldo').innerHTML = html||'<tr><td colspan="3" class="tengah">Belum ada data</td></tr>';
+    document.getElementById('ns_debit').innerText = formatRupiah(totalD);
+    document.getElementById('ns_kredit').innerText = formatRupiah(totalK);
+}
+
+function hitungLabaRugi() {
+    let pendapatan = 0, gaji=0, listrik=0, sewa=0, lain=0;
+    dataJurnal.forEach(trs=>{
+        if(trs.akun=='Pendapatan') pendapatan += trs.posisi=='kredit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun=='Beban Gaji') gaji += trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun=='Beban Listrik') listrik += trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun=='Beban Sewa') sewa += trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun=='Beban Lainnya') lain += trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+    });
+    const totalBeban = gaji+listrik+sewa+lain;
+    const laba = pendapatan - totalBeban;
+    document.getElementById('periode_laporan').innerText = new Date().toLocaleDateString('id-ID',{month:'long', year:'numeric'});
+    document.getElementById('pendapatan').innerText = formatRupiah(pendapatan);
+    document.getElementById('total_pendapatan').innerText = formatRupiah(pendapatan);
+    document.getElementById('beban_gaji').innerText = formatRupiah(gaji);
+    document.getElementById('beban_listrik').innerText = formatRupiah(listrik);
+    document.getElementById('beban_sewa').innerText = formatRupiah(sewa);
+    document.getElementById('beban_lain').innerText = formatRupiah(lain);
+    document.getElementById('total_beban').innerText = formatRupiah(totalBeban);
+    document.getElementById('laba_rugi').innerText = formatRupiah(laba);
+    document.getElementById('laba_rugi').style.color = laba>=0?'#059669':'#ef4444';
+}
+
+function hitungNeraca() {
+    let kas=0, piutang=0, persediaan=0, peralatan=0, utang=0, modal=0;
+    dataJurnal.forEach(trs=>{
+        let nilai = trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun=='Kas') kas += nilai;
+        if(trs.akun=='Piutang Usaha') piutang += nilai;
+        if(trs.akun=='Persediaan Barang') persediaan += nilai;
+        if(trs.akun=='Peralatan') peralatan += nilai;
+        if(trs.akun=='Utang Usaha') utang += -nilai;
+        if(trs.akun=='Modal') modal += -nilai;
+    });
+    let laba = 0;
+    dataJurnal.forEach(trs=>{
+        if(trs.akun=='Pendapatan') laba += trs.posisi=='kredit'?trs.jumlah:-trs.jumlah;
+        if(trs.akun.includes('Beban')) laba -= trs.posisi=='debit'?trs.jumlah:-trs.jumlah;
+    });
+    const totalAset = kas+piutang+persediaan+peralatan;
+    const totalPasiva = utang+modal+laba;
+    document.getElementById('tanggal_neraca').innerText = new Date().toLocaleDateString('id-ID');
+    document.getElementById('aset_kas').innerText = formatRupiah(kas);
+    document.getElementById('aset_piutang').innerText = formatRupiah(piutang);
+    document.getElementById('aset_persediaan').innerText = formatRupiah(persediaan);
+    document.getElementById('aset_peralatan').innerText = formatRupiah(peralatan);
+    document.getElementById('total_aset_neraca').innerText = formatRupiah(totalAset);
+    document.getElementById('utang').innerText = formatRupiah(utang);
+    document.getElementById('modal').innerText = formatRupiah(modal);
+    document.getElementById('laba_ditahan').innerText = formatRupiah(laba);
+    document.getElementById('total_pasiva').innerText = formatRupiah(totalPasiva);
+}
+
+function tampilBagianAkuntansi(nama) {
+    document.querySelectorAll('#akuntansi .bagian-laporan').forEach(b=>b.style.display='none');
+    document.getElementById(`bagian-${nama}`).style.display='block';
+}
+
+function inisialisasiDataAkuntansi() {
+    const daftarAset = [
+        {kode:'AST-001', nama:'Raspberry Pi Pico W', tgl:'2026-01-15', nilai:85000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-002', nama:'Modul Sensor Radar', tgl:'2026-01-15', nilai:125000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-003', nama:'Modul Sensor Suhu/Getaran', tgl:'2026-01-15', nilai:95000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-004', nama:'Komputer Server', tgl:'2026-02-20', nilai:7500000, masa:8, kategori:'Kelompok III'},
+        {kode:'AST-005', nama:'Perangkat Jaringan & WiFi', tgl:'2026-02-20', nilai:2100000, masa:8, kategori:'Kelompok III'},
+        {kode:'AST-006', nama:'Perangkat Sidik Jari', tgl:'2026-03-05', nilai:320000, masa:4, kategori:'Kelompok II'},
+    ];
+
+    const daftarBiaya = [
+        {tgl:'2026-07-01', jenis:'Listrik & Internet', ket:'Pemakaian Bulan Juli', jumlah:450000, akun:'Biaya Utilitas'},
+        {tgl:'2026-07-05', jenis:'Pemeliharaan Sistem', ket:'Pengecekan Rutin Perangkat', jumlah:250000, akun:'Biaya Perbaikan'},
+        {tgl:'2026-07-10', jenis:'Biaya Langganan', ket:'Layanan Firebase & Domain', jumlah:180000, akun:'Biaya Langganan'},
+        {tgl:'2026-07-15', jenis:'Perlengkapan Pendukung', ket:'Kabel & Komponen Tambahan', jumlah:120000, akun:'Biaya Perlengkapan'},
+    ];
+
+    let htmlAset = "";
+    let totalAset = 0;
+    daftarAset.forEach(a=>{
+        totalAset += a.nilai;
+        htmlAset += `<tr>
+            <td>${a.kode}</td>
+            <td>${a.nama}</td>
+            <td>${a.tgl}</td>
+            <td>${formatRupiah(a.nilai)}</td>
+            <td>${a.masa} Tahun</td>
+            <td>${a.kategori}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_aset').innerHTML = htmlAset;
+    document.getElementById('total_aset').innerText = formatRupiah(totalAset);
+
+    let htmlBiaya = "";
+    let totalBiaya = 0;
+    daftarBiaya.forEach(b=>{
+        totalBiaya += b.jumlah;
+        htmlBiaya += `<tr>
+            <td>${b.tgl}</td>
+            <td>${b.jenis}</td>
+            <td>${b.ket}</td>
+            <td>${formatRupiah(b.jumlah)}</td>
+            <td>${b.akun}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_biaya').innerHTML = htmlBiaya;
+    document.getElementById('total_biaya').innerText = formatRupiah(totalBiaya);
+
+    let htmlPenyusutan = "";
+    let totalPenyusutan = 0;
+    daftarAset.forEach(a=>{
+        const nilaiSisa = Math.round(a.nilai * 0.01);
+        const penyusutanTahunan = Math.round((a.nilai - nilaiSisa) / a.masa);
+        const akumulasi = Math.round(penyusutanTahunan * 0.5);
+        const nilaiBuku = a.nilai - akumulasi;
+        totalPenyusutan += penyusutanTahunan;
+        htmlPenyusutan += `<tr>
+            <td>${a.kode}</td>
+            <td>${formatRupiah(a.nilai)}</td>
+            <td>${formatRupiah(nilaiSisa)}</td>
+            <td>${formatRupiah(penyusutanTahunan)}</td>
+            <td>${formatRupiah(akumulasi)}</td>
+            <td>${formatRupiah(nilaiBuku)}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_penyusutan').innerHTML = htmlPenyusutan;
+    document.getElementById('total_penyusutan').innerText = formatRupiah(totalPenyusutan);
+
+    const dasarPengurangan = totalBiaya + (totalPenyusutan/2);
+    const estimasiPajak = Math.round(dasarPengurangan * 0.22);
+    document.getElementById('estimasi_pph').innerText = formatRupiah(estimasiPajak);
+}
+
+function simpanData() {
+    localStorage.setItem('dataAkuntansi', JSON.stringify(dataJurnal));
+    alert('✅ Data tersimpan aman!');
+}
+
+function eksporExcel() {
+    let teks = "Tanggal\tAkun\tKeterangan\tDebit\tKredit\n";
+    dataJurnal.forEach(trs=>{
+        teks += `${trs.tgl}\t${trs.akun}\t${trs.ket}\t${trs.posisi=='debit'?trs.jumlah:0}\t${trs.posisi=='kredit'?trs.jumlah:0}\n`;
+    });
+    const blob = new Blob([teks], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download="Data_Akuntansi.txt"; a.click();
+}
+
+if(localStorage.getItem('dataAkuntansi')){
+    dataJurnal = JSON.parse(localStorage.getItem('dataAkuntansi'));
+}
+muatUlang();
+</script>
+</body>
+</html>
