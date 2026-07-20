@@ -372,6 +372,214 @@ if(localStorage.getItem('dataAkuntansi')){
     dataJurnal = JSON.parse(localStorage.getItem('dataAkuntansi'));
 }
 muatUlang();
+    
+    <!-- ==================================================
+     📑 HALAMAN AKUNTANSI & KEPATUHAN PAJAK
+     ================================================== -->
+<div id="halaman-akuntansi" class="halaman laporan-body">
+    <div class="kepala-laporan">
+        <h1>📑 SISTEM AKUNTANSI & KEPATUHAN PAJAK</h1>
+        <p style="margin-top:8px;">PT. SISTEM TEKNOLOGI NUSANTARA</p>
+        <p style="margin-top:5px;">Standar: PSAK & Peraturan Perpajakan Indonesia</p>
+    </div>
+
+    <!-- MENU BAGIAN AKUNTANSI -->
+    <div style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;">
+        <button class="tombol biru" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('aset')">💻 Aset Tetap</button>
+        <button class="tombol oranye" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('biaya')">💸 Biaya Operasional</button>
+        <button class="tombol ungu" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('penyusutan')">📉 Penyusutan</button>
+        <button class="tombol hijau" style="width:auto; padding:8px 12px;" onclick="tampilBagianAkuntansi('pajak')">🧾 Laporan Pajak</button>
+    </div>
+
+    <!-- BAGIAN ASET TETAP -->
+    <div id="bagian-aset" class="bagian-laporan">
+        <h3 style="color:#1d4ed8; margin-bottom:12px;">💻 DAFTAR ASET TETAP</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode Aset</th>
+                    <th>Nama Barang</th>
+                    <th>Tanggal Perolehan</th>
+                    <th>Nilai Perolehan (Rp)</th>
+                    <th>Masa Manfaat</th>
+                    <th>Kategori Pajak</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_aset"></tbody>
+        </table>
+    </div>
+
+    <!-- BAGIAN BIAYA OPERASIONAL -->
+    <div id="bagian-biaya" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#ea580c; margin-bottom:12px;">💸 REKAP BIAYA OPERASIONAL</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Jenis Biaya</th>
+                    <th>Keterangan</th>
+                    <th>Jumlah (Rp)</th>
+                    <th>Akun Pajak</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_biaya"></tbody>
+        </table>
+    </div>
+
+    <!-- BAGIAN PENYUSUTAN -->
+    <div id="bagian-penyusutan" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#7c3aed; margin-bottom:12px;">📉 PERHITUNGAN PENYUSUTAN</h3>
+        <p style="margin-bottom:10px;">* Menurut Aturan Pajak: Metode Garis Lurus</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Kode Aset</th>
+                    <th>Nilai Perolehan</th>
+                    <th>Nilai Sisa</th>
+                    <th>Penyusutan Tahunan</th>
+                    <th>Akumulasi Penyusutan</th>
+                    <th>Nilai Buku</th>
+                </tr>
+            </thead>
+            <tbody id="daftar_penyusutan"></tbody>
+        </table>
+    </div>
+
+    <!-- BAGIAN LAPORAN PAJAK -->
+    <div id="bagian-pajak" class="bagian-laporan" style="display:none;">
+        <h3 style="color:#059669; margin-bottom:12px;">🧾 RINGKASAN UNTUK PELAPORAN PAJAK</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-bottom:15px;">
+            <div class="kotak" style="background:#ecfdf5;">
+                <p>Total Aset Tetap</p>
+                <div class="angka hijau" id="total_aset">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#fff7ed;">
+                <p>Total Biaya Dikurangkan</p>
+                <div class="angka oranye" id="total_biaya">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#f5f3ff;">
+                <p>Total Penyusutan</p>
+                <div class="angka ungu" id="total_penyusutan">Rp 0</div>
+            </div>
+            <div class="kotak" style="background:#fef3c7;">
+                <p>Estimasi PPh Badan</p>
+                <div class="angka kuning" id="estimasi_pph">Rp 0</div>
+            </div>
+        </div>
+        <div style="background:#f8fafc; padding:15px; border-radius:10px;">
+            <h4>📝 Catatan Konsultasi Pajak:</h4>
+            <ul style="margin:10px 0 0 20px; line-height:1.7;">
+                <li>Kategori aset sesuai Pasal 11 UU PPh</li>
+                <li>Masa manfaat: Kelompok II = 4 Tahun, Kelompok III = 8 Tahun</li>
+                <li>Penyusutan dihitung setelah aset digunakan</li>
+                <li>Semua bukti pencatatan dapat dijadikan lampiran laporan pajak</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============= FUNGSI TAMBAHAN AKUNTANSI =============
+function tampilBagianAkuntansi(nama) {
+    document.querySelectorAll('#halaman-akuntansi .bagian-laporan').forEach(b=>b.style.display='none');
+    document.getElementById(`bagian-${nama}`).style.display='block';
+}
+
+function formatRupiah(angka) {
+    return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+function inisialisasiDataAkuntansi() {
+    // Data Aset Tetap
+    const daftarAset = [
+        {kode:'AST-001', nama:'Raspberry Pi Pico W', tgl:'2026-01-15', nilai:85000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-002', nama:'Modul Sensor Radar', tgl:'2026-01-15', nilai:125000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-003', nama:'Modul Sensor Suhu/Getaran', tgl:'2026-01-15', nilai:95000, masa:4, kategori:'Kelompok II'},
+        {kode:'AST-004', nama:'Komputer Server', tgl:'2026-02-20', nilai:7500000, masa:8, kategori:'Kelompok III'},
+        {kode:'AST-005', nama:'Perangkat Jaringan & WiFi', tgl:'2026-02-20', nilai:2100000, masa:8, kategori:'Kelompok III'},
+        {kode:'AST-006', nama:'Perangkat Sidik Jari', tgl:'2026-03-05', nilai:320000, masa:4, kategori:'Kelompok II'},
+    ];
+
+    // Data Biaya Operasional
+    const daftarBiaya = [
+        {tgl:'2026-07-01', jenis:'Listrik & Internet', ket:'Pemakaian Bulan Juli', jumlah:450000, akun:'Biaya Utilitas'},
+        {tgl:'2026-07-05', jenis:'Pemeliharaan Sistem', ket:'Pengecekan Rutin Perangkat', jumlah:250000, akun:'Biaya Perbaikan'},
+        {tgl:'2026-07-10', jenis:'Biaya Langganan', ket:'Layanan Firebase & Domain', jumlah:180000, akun:'Biaya Langganan'},
+        {tgl:'2026-07-15', jenis:'Perlengkapan Pendukung', ket:'Kabel & Komponen Tambahan', jumlah:120000, akun:'Biaya Perlengkapan'},
+    ];
+
+    // Tampilkan Aset
+    let htmlAset = "";
+    let totalAset = 0;
+    daftarAset.forEach(a=>{
+        totalAset += a.nilai;
+        htmlAset += `<tr>
+            <td>${a.kode}</td>
+            <td>${a.nama}</td>
+            <td>${a.tgl}</td>
+            <td>${formatRupiah(a.nilai)}</td>
+            <td>${a.masa} Tahun</td>
+            <td>${a.kategori}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_aset').innerHTML = htmlAset;
+    document.getElementById('total_aset').innerText = formatRupiah(totalAset);
+
+    // Tampilkan Biaya
+    let htmlBiaya = "";
+    let totalBiaya = 0;
+    daftarBiaya.forEach(b=>{
+        totalBiaya += b.jumlah;
+        htmlBiaya += `<tr>
+            <td>${b.tgl}</td>
+            <td>${b.jenis}</td>
+            <td>${b.ket}</td>
+            <td>${formatRupiah(b.jumlah)}</td>
+            <td>${b.akun}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_biaya').innerHTML = htmlBiaya;
+    document.getElementById('total_biaya').innerText = formatRupiah(totalBiaya);
+
+    // Hitung & Tampilkan Penyusutan
+    let htmlPenyusutan = "";
+    let totalPenyusutan = 0;
+    daftarAset.forEach(a=>{
+        const nilaiSisa = Math.round(a.nilai * 0.01); // 1% nilai perolehan
+        const penyusutanTahunan = Math.round((a.nilai - nilaiSisa) / a.masa);
+        const akumulasi = Math.round(penyusutanTahunan * 0.5); // Contoh: sudah dipakai 6 bulan
+        const nilaiBuku = a.nilai - akumulasi;
+        totalPenyusutan += penyusutanTahunan;
+        htmlPenyusutan += `<tr>
+            <td>${a.kode}</td>
+            <td>${formatRupiah(a.nilai)}</td>
+            <td>${formatRupiah(nilaiSisa)}</td>
+            <td>${formatRupiah(penyusutanTahunan)}</td>
+            <td>${formatRupiah(akumulasi)}</td>
+            <td>${formatRupiah(nilaiBuku)}</td>
+        </tr>`;
+    });
+    document.getElementById('daftar_penyusutan').innerHTML = htmlPenyusutan;
+    document.getElementById('total_penyusutan').innerText = formatRupiah(totalPenyusutan);
+
+    // Estimasi Pajak (Tarif PPh Badan 22%)
+    const dasarPengurangan = totalBiaya + (totalPenyusutan/2);
+    const estimasiPajak = Math.round(dasarPengurangan * 0.22);
+    document.getElementById('estimasi_pph').innerText = formatRupiah(estimasiPajak);
+}
+
+// Tambahkan menu akuntansi ke daftar menu
+document.querySelector('.menu').innerHTML += ` | <a href="#" onclick="bukaHalaman('akuntansi')">📑 AKUNTANSI</a>`;
+
+// Jalankan data akuntansi saat halaman dimuat
+window.onload = function() {
+    document.getElementById('waktu_laporan').innerText = formatWaktu();
+    isiPerangkat();
+    bacaDataDariPico();
+    inisialisasiDataAkuntansi();
+    setInterval(bacaDataDariPico, 3000);
+}
+
 </script>
 </body>
 </html>
