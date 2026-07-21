@@ -123,11 +123,6 @@
 <body>
 
 <h1>🔍 Pemeriksa Celah Keamanan Web</h1>
-<p class="subjudul">Simulasi Pembelajaran: Cara Menemukan & Melaporkan Celah Keamanan dengan Benar</p>
-
-<div class="peringatan_hukum">
-    ⚠️ <strong>ATURAN PENTING:</strong><br>
-    Alat ini hanya untuk pembelajaran. Menemukan celah keamanan <strong>wajib</strong> dilaporkan kepada pemilik sistem secara sah dan bertanggung jawab, tidak boleh disalahgunakan untuk mengakses, mengubah, atau mencuri data tanpa izin. Pelanggaran melanggar UU ITE dan UU Perlindungan Data Pribadi.
 </div>
 
 <div class="kotak">
@@ -273,7 +268,7 @@ ${DAFTAR_PEMERIKSAAN.map(i => `• ${i.nama}
   - Masalah: ${i.deskripsi}
   - Saran: ${i.solusi}`).join('\n\n')}
 
-Saya melaporkan hal ini dengan itikad baik demi keamanan sistem, dan bersedia membantu memberikan penjelasan lebih lanjut jika diperlukan.`;
+Saya melaporkan hal ini dengan itikad baik demi keamanan sistem
 
     kotak_laporan.style.display = 'block';
     document.getElementById('btn_periksa').disabled = false;
