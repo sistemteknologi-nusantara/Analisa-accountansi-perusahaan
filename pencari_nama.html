@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tebak Nama dari Foto</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        * {font-family: 'Segoe UI', sans-serif; box-sizing:border-box; margin:0; padding:0;}
+        body {background:#f0f4f8; padding:20px; text-align:center; max-width:800px; margin:0 auto;}
+        h1 {color:#1e40af; margin-bottom:10px;}
+        .kotak {background:white; padding:25px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1); margin:20px 0;}
+        input, button {padding:12px 20px; margin:10px; border-radius:8px; border:1px solid #ccc; font-size:16px;}
+        button {background:#1e40af; color:white; border:none; cursor:pointer; font-weight:bold;}
+        button:disabled {background:#94a3b8; cursor:not-allowed;}
+        #preview {max-width:400px; border-radius:10px; margin:15px auto; display:none;}
+        .hasil {margin-top:20px; padding:15px; border-radius:10px; font-size:18px; font-weight:bold; display:none;}
+        .siap {background:#dcfce7; color:#166534;}
+        .proses {background:#fff7ed; color:#c2410c;}
+        .ketemu {background:#dbeafe; color:#1e40af;}
+        .tidak {background:#fef2f2; color:#dc2626;}
+        .info {margin-top:15px; font-size:14px; color:#64748b; line-height:1.6;}
+    </style>
+</head>
+<body>
+
+<h1>🔍 Cari Nama dari Foto</h1>
+
+<div class="kotak">
+    <div class="hasil proses" id="status">⏳ Sedang memuat sistem pintar...</div>
+
+    <input type="file" id="unggah_foto" accept="image/*" disabled>
+    <br>
+    <img id="preview" alt="Pratinjau Foto">
+    <br>
+    <button id="tombol_cari" disabled>🔎 Cari Nama</button>
+
+    <div class="hasil" id="tampil_hasil"></div>
+
+    <div class="info">
+        📝 Cara kerja: Simpan dulu data wajah & nama orang yang dicari ke dalam sistem.<br>
+        ⚠️ Hanya bisa mengenali orang yang datanya sudah dimasukkan sebelumnya.
+    </div>
+</div>
+
+<script>
+// ============== DATA ORANG YANG DIKETAHUI ==============
+// Nanti Anda bisa menambahkan data wajah orang lain di sini
+const DAFTAR_ORANG = [
+    {nama: "Jaha", file: "wajah_jaha.jpg"},
+    {nama: "Budi", file: "wajah_budi.jpg"}
+];
+
+let model_siap = false;
+let deskripsi_wajah_tersimpan = [];
+
+// ============== MEMUAT MODEL AI ==============
+async function muatModel() {
+    try {
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('https://raw.githubusercontent.com/ml5js/ml5-data-and-models/main/models/faceapi/ssd_mobilenetv1_model-weights_manifest.json');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('https://raw.githubusercontent.com/ml5js/ml5-data-and-models/main/models/faceapi/face_landmark68_model-weights_manifest.json');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('https://raw.githubusercontent.com/ml5js/ml5-data-and-models/main/models/faceapi/face_recognition_model-weights_manifest.json');
+        
+        document.getElementById('status').textContent = "✅ Sistem siap! Silakan unggah foto";
+        document.getElementById('status').className = "hasil siap";
+        document.getElementById('unggah_foto').disabled = false;
+        document.getElementById('tombol_cari').disabled = false;
+        model_siap = true;
+
+        // Memuat data wajah yang sudah diketahui
+        for(let orang of DAFTAR_ORANG){
+            const img = await faceapi.fetchImage(orang.file);
+            const deteksi = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
+            if(deteksi){
+                deskripsi_wajah_tersimpan.push({
+                    nama: orang.nama,
+                    deskripsi: deteksi.descriptor
+                });
+            }
+        }
+
+    } catch (err) {
+        document.getElementById('status').textContent = "❌ Gagal memuat sistem: " + err.message;
+    }
+}
+
+// ============== MENAMPILKAN PRATINJAU FOTO ==============
+let foto_terpilih = null;
+document.getElementById('unggah_foto').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    foto_terpilih = await faceapi.bufferToImage(file);
+    const pratinjau = document.getElementById('preview');
+    pratinjau.src = foto_terpilih.src;
+    pratinjau.style.display = 'block';
+    document.getElementById('tampil_hasil').style.display = 'none';
+});
+
+// ============== PROSES MENCOCOKAN & MENEBUK NAMA ==============
+document.getElementById('tombol_cari').addEventListener('click', async () => {
+    if(!foto_terpilih || !model_siap) return;
+
+    const tampil_hasil = document.getElementById('tampil_hasil');
+    tampil_hasil.style.display = 'block';
+    tampil_hasil.textContent = "🔍 Sedang membandingkan wajah...";
+    tampil_hasil.className = "hasil proses";
+
+    try {
+        const deteksi = await faceapi.detectSingleFace(foto_terpilih)
+                                    .withFaceLandmarks()
+                                    .withFaceDescriptor();
+
+        if(!deteksi){
+            tampil_hasil.textContent = "❌ Tidak ditemukan wajah pada foto";
+            tampil_hasil.className = "hasil tidak";
+            return;
+        }
+
+        // Membandingkan dengan data yang tersimpan
+        const cocokkan = deskripsi_wajah_tersimpan.map(orang => 
+            new faceapi.FaceMatcher(orang.deskripsi)
+        );
+
+        let nama_terbaik = "Tidak Diketahui";
+        let skor_terbaik = 0;
+        const AMBANG_BATAS = 0.6; // Semakin kecil semakin ketat
+
+        for(let i=0; i<deskripsi_wajah_tersimpan.length; i++){
+            const skor = 1 - faceapi.utils.euclideanDistance(deteksi.descriptor, deskripsi_wajah_tersimpan[i].deskripsi);
+            if(skor > skor_terbaik && skor >= (1 - AMBANG_BATAS)){
+                skor_terbaik = skor;
+                nama_terbaik = deskripsi_wajah_tersimpan[i].nama;
+            }
+        }
+
+        if(nama_terbaik !== "Tidak Diketahui"){
+            tampil_hasil.innerHTML = `✅ <strong>Nama yang Ditemukan: ${nama_terbaik}</strong><br>Tingkat Kecocokan: ${Math.round(skor_terbaik*100)}%`;
+            tampil_hasil.className = "hasil ketemu";
+        } else {
+            tampil_hasil.innerHTML = "❌ Wajah ini belum ada dalam daftar data";
+            tampil_hasil.className = "hasil tidak";
+        }
+
+    } catch (err) {
+        tampil_hasil.textContent = "⚠️ Terjadi kesalahan: " + err.message;
+    }
+});
+
+// Jalankan saat halaman dibuka
+muatModel();
+</script>
+
+</body>
+</html>
