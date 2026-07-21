@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemeriksa Celah Keamanan Web - Versi Lengkap</title>
+    <style>
+        * {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4f8;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subjudul {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+        .peringatan_hukum {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 10px 10px 0;
+            font-size: 14px;
+            color: #92400e;
+            line-height: 1.6;
+        }
+        .kotak {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 18px;
+        }
+        h2 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 18px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        input, button {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 16px;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        .tombol_grup {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            flex: 1;
+            min-width: 140px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+        button.cek { background: #166534; color: white; }
+        button.reset { background: #dc2626; color: white; }
+        button.lapor { background: #1e40af; color: white; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+
+        .item_cek {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .tinggi { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
+        .sedang { background: #fffbeb; border-color: #f59e0b; color: #92400e; }
+        .rendah { background: #f0fdf4; border-color: #22c55e; color: #166534; }
+        .aman { background: #eff6ff; border-color: #3b82f6; color: #1d4ed8; }
+
+        .nama_celah { font-weight: bold; margin-bottom: 4px; }
+        .deskripsi { font-size: 14px; line-height: 1.5; }
+        .solusi { font-size: 13px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed rgba(0,0,0,0.1); }
+
+        .laporan {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: none;
+        }
+        pre {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
+        }
+        .proses { background: #fff7ed; color: #c2410c; display: block; }
+        .selesai { background: #dcfce7; color: #166534; display: block; }
+    </style>
+</head>
+<body>
+
+<h1>🔍 Pemeriksa Celah Keamanan Web</h1>
+<p class="subjudul">Simulasi Pembelajaran: Cara Menemukan & Melaporkan Celah Keamanan dengan Benar</p>
+
+<div class="peringatan_hukum">
+    ⚠️ <strong>ATURAN PENTING:</strong><br>
+    Alat ini hanya untuk pembelajaran. Menemukan celah keamanan <strong>wajib</strong> dilaporkan kepada pemilik sistem secara sah dan bertanggung jawab, tidak boleh disalahgunakan untuk mengakses, mengubah, atau mencuri data tanpa izin. Pelanggaran melanggar UU ITE dan UU Perlindungan Data Pribadi.
+</div>
+
+<div class="kotak">
+    <h2>📍 Masukkan Alamat Situs yang Akan Diperiksa</h2>
+    <input type="text" id="alamat_situs" placeholder="Contoh: nama-situs.go.id atau www.nasa.gov">
+    <div class="tombol_grup">
+        <button class="cek" id="btn_periksa">🔍 Mulai Pemeriksaan Lengkap</button>
+        <button class="reset" id="btn_reset">🔄 Reset</button>
+    </div>
+
+    <div class="status proses" id="status_proses"></div>
+    <div id="daftar_hasil"></div>
+</div>
+
+<div class="kotak laporan" id="kotak_laporan">
+    <h2>📝 Contoh Laporan Temuan (Cara Melapor yang Benar)</h2>
+    <pre id="isi_laporan"></pre>
+    <button class="lapor" id="btn_salin_laporan">📋 Salin Contoh Laporan</button>
+</div>
+
+<script>
+// DAFTAR LENGKAP CELAH KEAMANAN STANDAR
+const DAFTAR_PEMERIKSAAN = [
+    {
+        nama: "Koneksi Tidak Terenkripsi (Tanpa HTTPS)",
+        tingkat: "tinggi",
+        deskripsi: "Situs masih menggunakan koneksi HTTP biasa, semua data yang dikirim bisa disadap dan dicuri oleh pihak lain.",
+        solusi: "Pasang sertifikat keamanan SSL/TLS dan arahkan semua akses ke HTTPS."
+    },
+    {
+        nama: "Kebijakan Keamanan Konten (CSP) Tidak Ada",
+        tingkat: "tinggi",
+        deskripsi: "Tidak ada aturan yang membatasi apa saja yang boleh dimuat di halaman, sehingga rentan disisipi kode jahat (XSS).",
+        solusi: "Konfigurasi header Content-Security-Policy yang ketat sesuai kebutuhan sistem."
+    },
+    {
+        nama: "Validasi Input Pengguna Tidak Ada",
+        tingkat: "tinggi",
+        deskripsi: "Sistem menerima semua masukan dari pengguna tanpa memeriksa isinya, rentan terhadap penyisipan kode berbahaya atau perintah database.",
+        solusi: "Lakukan pemfilteran dan pemeriksaan ketat pada semua data yang dimasukkan pengguna."
+    },
+    {
+        nama: "Tidak Ada Batasan Percobaan Masuk",
+        tingkat: "tinggi",
+        deskripsi: "Sistem tidak membatasi berapa kali seseorang bisa mencoba menebak kata sandi, sehingga mudah dibobol secara otomatis.",
+        solusi: "Batasi jumlah percobaan masuk, kunci sementara akun setelah beberapa kali gagal, dan gunakan verifikasi tambahan."
+    },
+    {
+        nama: "Membocorkan Informasi Teknis Server",
+        tingkat: "sedang",
+        deskripsi: "Sistem menampilkan versi perangkat lunak, nama sistem operasi, atau detail teknis lain, memudahkan penyerang mencari celah yang sudah diketahui publik.",
+        solusi: "Matikan tampilan informasi versi dan detail teknis pada pengaturan server."
+    },
+    {
+        nama: "Cookie Tidak Dilindungi",
+        tingkat: "sedang",
+        deskripsi: "Data sesi pengguna tidak dilindungi tanda aman dan tidak bisa hanya dikirim lewat koneksi terenkripsi, mudah dicuri.",
+        solusi: "Tambahkan atribut Secure, HttpOnly, dan SameSite pada semua cookie sesi."
+    },
+    {
+        nama: "Menggunakan Perangkat Lunak Kedaluwarsa",
+        tingkat: "sedang",
+        deskripsi: "Sistem menggunakan versi perangkat lunak, pustaka, atau kerangka kerja yang sudah lama tidak diperbarui, banyak celah yang sudah diketahui dan diperbaiki.",
+        solusi: "Perbarui semua perangkat lunak secara berkala ke versi terbaru yang aman."
+    },
+    {
+        nama: "Izin Akses Tidak Sesuai",
+        tingkat: "sedang",
+        deskripsi: "Pengguna biasa bisa mengakses halaman atau data yang seharusnya hanya milik pengelola/pemilik sistem.",
+        solusi: "Periksa dan atur ulang hak akses setiap halaman sesuai dengan peran pengguna."
+    },
+    {
+        nama: "Kebijakan Berbagi Sumber Daya Lemah",
+        tingkat: "rendah",
+        deskripsi: "Pengaturan berbagi data antar situs terlalu longgar, memungkinkan situs lain mengakses data yang tidak semestinya.",
+        solusi: "Konfigurasi header CORS agar hanya mengizinkan akses dari sumber yang dipercaya saja."
+    },
+    {
+        nama: "Pesan Kesalahan Terlalu Jelas",
+        tingkat: "rendah",
+        deskripsi: "Sistem menampilkan pesan kesalahan yang terlalu rinci, yang bisa memberikan petunjuk cara menyerang sistem.",
+        solusi: "Ubah pesan kesalahan agar hanya menampilkan pesan umum kepada pengguna, simpan rincian kesalahan hanya di catatan internal."
+    }
+];
+
+let alamat_target = "";
+
+// Mulai Pemeriksaan
+document.getElementById('btn_periksa').addEventListener('click', async () => {
+    alamat_target = document.getElementById('alamat_situs').value.trim();
+    if(!alamat_target) {
+        alert("Silakan masukkan alamat situs terlebih dahulu!");
+        return;
+    }
+
+    const status = document.getElementById('status_proses');
+    const hasil = document.getElementById('daftar_hasil');
+    const kotak_laporan = document.getElementById('kotak_laporan');
+
+    status.style.display = 'block';
+    status.className = 'status proses';
+    status.textContent = `⏳ Sedang memeriksa keamanan: ${alamat_target} ...`;
+    hasil.innerHTML = "";
+    kotak_laporan.style.display = 'none';
+    document.getElementById('btn_periksa').disabled = true;
+
+    // Simulasi proses pemeriksaan lengkap
+    await new Promise(tunggu => setTimeout(tunggu, 3000));
+
+    status.className = 'status selesai';
+    status.textContent = `✅ Pemeriksaan selesai untuk: ${alamat_target}`;
+
+    let jumlah_tinggi = 0, jumlah_sedang = 0, jumlah_rendah = 0;
+
+    DAFTAR_PEMERIKSAAN.forEach(item => {
+        if(item.tingkat === 'tinggi') jumlah_tinggi++;
+        else if(item.tingkat === 'sedang') jumlah_sedang++;
+        else jumlah_rendah++;
+
+        const elemen = document.createElement('div');
+        elemen.className = `item_cek ${item.tingkat}`;
+        elemen.innerHTML = `
+            <div class="nama_celah">⚠️ ${item.nama} (Risiko: ${item.tingkat.toUpperCase()})</div>
+            <div class="deskripsi">${item.deskripsi}</div>
+            <div class="solusi">💡 <strong>Cara Memperbaiki:</strong> ${item.solusi}</div>
+        `;
+        hasil.appendChild(elemen);
+    });
+
+    // Buat contoh laporan
+    document.getElementById('isi_laporan').textContent = 
+`LAPORAN TEMUAN CELAH KEAMANAN
+Alamat Situs: ${alamat_target}
+Tanggal: ${new Date().toLocaleDateString('id-ID')}
+
+RINGKASAN TEMUAN:
+- Celah Risiko Tinggi: ${jumlah_tinggi} butir
+- Celah Risiko Sedang: ${jumlah_sedang} butir
+- Celah Risiko Rendah: ${jumlah_rendah} butir
+
+DETAIL & SARAN PERBAIKAN:
+${DAFTAR_PEMERIKSAAN.map(i => `• ${i.nama}
+  - Masalah: ${i.deskripsi}
+  - Saran: ${i.solusi}`).join('\n\n')}
+
+Saya melaporkan hal ini dengan itikad baik demi keamanan sistem, dan bersedia membantu memberikan penjelasan lebih lanjut jika diperlukan.`;
+
+    kotak_laporan.style.display = 'block';
+    document.getElementById('btn_periksa').disabled = false;
+});
+
+// Reset
+document.getElementById('btn_reset').addEventListener('click', () => {
+    document.getElementById('alamat_situs').value = "";
+    document.getElementById('status_proses').style.display = 'none';
+    document.getElementById('daftar_hasil').innerHTML = "";
+    document.getElementById('kotak_laporan').style.display = 'none';
+});
+
+// Salin Laporan
+document.getElementById('btn_salin_laporan').addEventListener('click', () => {
+    const teks = document.getElementById('isi_laporan').textContent;
+    navigator.clipboard.writeText(teks).then(() => {
+        alert("✅ Contoh laporan berhasil disalin!");
+    }).catch(() => {
+        alert("⚠️ Gagal menyalin, silakan salin secara manual.");
+    });
+});
+</script>
+
+</body>
+</html>
