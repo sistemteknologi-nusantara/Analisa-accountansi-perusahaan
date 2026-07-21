@@ -1,0 +1,178 @@
+# =====================================================
+# SISTEM PELACAKAN & PENGUKURAN KECEPATAN KENDARAAN
+# Teknologi: YOLOv8 + DeepSORT + Transformasi Perspektif
+# =====================================================
+
+import cv2
+import numpy as np
+from ultralytics import YOLO
+from deep_sort_realtime.deepsort_tracker import DeepSort
+
+# ---------------- KONFIGURASI UTAMA ----------------
+# Muat model YOLOv8 (pilih yolov8n.pt untuk ringan, yolov8s.pt untuk akurat)
+model = YOLO('yolov8s.pt')
+
+# Inisialisasi Pelacak DeepSORT
+pelacak = DeepSort(max_age=5)
+
+# Parameter Pengaturan
+MIN_TRACK_FRAMES = 8       # Minimal berapa frame sebelum menampilkan kecepatan
+HISTORY_LEN = 25           # Jumlah riwayat posisi untuk rata-rata
+MAX_ALLOWED_KPH = 200      # Batas kecepatan maksimal yang masuk akal
+MIN_PIXEL_DIST = 2         # Jarak minimal pergerakan piksel
+SPEED_GREEN = 60           # Batas kecepatan aman (warna hijau)
+SPEED_YELLOW = 100         # Batas kecepatan peringatan (warna kuning)
+
+# Daftar kelas yang dideteksi (hanya kendaraan)
+KELAS_TARGET = {2: 'mobil', 3: 'sepeda motor', 5: 'bus', 7: 'truk'}
+
+# ---------------- FUNGSI UBAH PERSPEKTIF ----------------
+def ubah_pandangan_burung(titik, matriks_transformasi):
+    """Ubah titik dari pandangan kamera ke pandangan dari atas (burung)"""
+    titik = np.array([titik], dtype=np.float32).reshape(-1,1,2)
+    titik_baru = cv2.perspectiveTransform(titik, matriks_transformasi)
+    return tuple(titik_baru[0][0].astype(int))
+
+def buat_matriks_jalan(lebar_jalan, tinggi_jalan, titik_sumber):
+    """Buat matriks transformasi berdasarkan titik jalan"""
+    titik_tujuan = np.float32([
+        [0, 0],
+        [lebar_jalan, 0],
+        [0, tinggi_jalan],
+        [lebar_jalan, tinggi_jalan]
+    ])
+    return cv2.getPerspectiveTransform(titik_sumber, titik_tujuan)
+
+# ---------------- FUNGSI HITUNG KECEPATAN ----------------
+def hitung_kecepatan(riwayat_posisi, jarak_meter_per_piksel, fps):
+    """Menghitung kecepatan dalam km/jam"""
+    if len(riwayat_posisi) < 2:
+        return 0
+    
+    # Ambil dua posisi terakhir
+    x1, y1 = riwayat_posisi[-2]
+    x2, y2 = riwayat_posisi[-1]
+    
+    # Hitung jarak dalam piksel lalu ubah ke meter
+    jarak_piksel = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+    jarak_meter = jarak_piksel * jarak_meter_per_piksel
+    
+    # Hitung waktu antar frame
+    waktu = 1 / fps
+    
+    # Hitung kecepatan m/s lalu ubah ke km/jam
+    kecepatan_ms = jarak_meter / waktu
+    kecepatan_kph = kecepatan_ms * 3.6
+    
+    return round(kecepatan_kph, 1)
+
+# ---------------- KONFIGURASI AREA JALAN ----------------
+# Sesuaikan titik ini dengan area jalan pada video Anda
+titik_jalan_sumber = np.float32([
+    (300, 250),   # Kiri Atas
+    (950, 250),   # Kanan Atas
+    (1920, 1080), # Kanan Bawah
+    (0, 1080)     # Kiri Bawah
+])
+
+# Ukuran jalan nyata dalam meter
+LEBAR_JALAN_METER = 12
+PANJANG_JALAN_METER = 50
+
+# Inisialisasi matriks transformasi
+LEBAR_TAMPILAN = 500
+TINGGI_TAMPILAN = 800
+matriks_transform = buat_matriks_jalan(LEBAR_TAMPILAN, TINGGI_TAMPILAN, titik_jalan_sumber)
+jarak_meter_per_piksel = PANJANG_JALAN_METER / TINGGI_TAMPILAN
+
+# ---------------- VARIABEL PENYIMPANAN DATA ----------------
+data_kendaraan = {}  # {id_kendaraan: {riwayat_posisi: [], kecepatan: 0}}
+
+# ---------------- MEMBUKA VIDEO / KAMERA ----------------
+# Ganti dengan 0 jika menggunakan kamera langsung
+sumber_video = 'jalanraya.mp4'
+video = cv2.VideoCapture(sumber_video)
+fps = video.get(cv2.CAP_PROP_FPS)
+lebar = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+tinggi = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+while video.isOpened():
+    berhasil, bingkai = video.read()
+    if not berhasil:
+        break
+
+    # Deteksi objek menggunakan YOLOv8
+    hasil = model(bingkai, classes=list(KELAS_TARGET.keys()), conf=0.3, verbose=False)
+    deteksi = []
+
+    for kotak in hasil[0].boxes:
+        x1, y1, x2, y2 = kotak.xyxy[0].cpu().numpy()
+        kepercayaan = kotak.conf[0].cpu().numpy()
+        kelas = int(kotak.cls[0].cpu().numpy())
+        deteksi.append(([x1, y1, x2-x1, y2-y1], kepercayaan, kelas))
+
+    # Perbarui pelacakan
+    objek_dilacak = pelacak.update_tracks(deteksi, frame=bingkai)
+
+    for objek in objek_dilacak:
+        if not objek.is_confirmed() or objek.time_since_update > 1:
+            continue
+        
+        id_kendaraan = objek.track_id
+        kotak = objek.to_ltrb()
+        x1, y1, x2, y2 = map(int, kotak)
+        
+        # Titik tengah bawah kendaraan
+        titik_tengah = (int((x1+x2)/2), int(y2))
+        
+        # Ubah ke pandangan burung
+        titik_burung = ubah_pandangan_burung(titik_tengah, matriks_transform)
+
+        # Simpan riwayat posisi
+        if id_kendaraan not in data_kendaraan:
+            data_kendaraan[id_kendaraan] = {
+                'posisi_burung': [],
+                'kecepatan': 0,
+                'dihitung': False
+            }
+        
+        data_kendaraan[id_kendaraan]['posisi_burung'].append(titik_burung)
+        if len(data_kendaraan[id_kendaraan]['posisi_burung']) > HISTORY_LEN:
+            data_kendaraan[id_kendaraan]['posisi_burung'].pop(0)
+
+        # Hitung kecepatan jika sudah cukup data
+        if len(data_kendaraan[id_kendaraan]['posisi_burung']) >= MIN_TRACK_FRAMES:
+            kecepatan = hitung_kecepatan(
+                data_kendaraan[id_kendaraan]['posisi_burung'],
+                jarak_meter_per_piksel,
+                fps
+            )
+            
+            if MIN_PIXEL_DIST < kecepatan < MAX_ALLOWED_KPH:
+                data_kendaraan[id_kendaraan]['kecepatan'] = kecepatan
+        
+        kecepatan_akhir = data_kendaraan[id_kendaraan]['kecepatan']
+
+        # Tentukan warna tulisan
+        if kecepatan_akhir < SPEED_GREEN:
+            warna = (0, 255, 0) # Hijau
+        elif kecepatan_akhir < SPEED_YELLOW:
+            warna = (0, 255, 255) # Kuning
+        else:
+            warna = (0, 0, 255) # Merah
+
+        # Gambar kotak dan tulisan kecepatan
+        cv2.rectangle(bingkai, (x1,y1), (x2,y2), warna, 2)
+        teks = f"Car {kecepatan_akhir} km/h"
+        cv2.putText(bingkai, teks, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, warna, 2)
+
+    # Tampilkan hasil
+    cv2.imshow('Sistem Pemantauan Kecepatan', bingkai)
+    
+    # Tekan tombol 'q' untuk keluar
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Tutup semua proses
+video.release()
+cv2.destroyAllWindows()
