@@ -1,0 +1,188 @@
+import cv2
+import numpy as np
+from ultralytics import YOLO
+from deep_sort_realtime.deepsort_tracker import DeepSort
+from google.colab.patches import cv2_imshow
+
+# ---------------- KONFIGURASI UTAMA ----------------
+model = YOLO('yolov8s.pt')
+pelacak = DeepSort(max_age=5)
+
+MIN_TRACK_FRAMES = 8       # Minimal berapa frame sebelum menampilkan kecepatan
+HISTORY_LEN = 25           # Jumlah riwayat posisi untuk rata-rata
+MAX_ALLOWED_KPH = 40       # Batas kecepatan masuk akal untuk manusia
+MIN_PIXEL_DIST = 2         # Jarak minimal pergerakan piksel
+SPEED_WALK = 6             # Batas kecepatan berjalan
+SPEED_RUN = 20             # Batas kecepatan berlari
+SPEED_GREEN = 60           # Batas kecepatan aman kendaraan
+SPEED_YELLOW = 100         # Batas kecepatan peringatan kendaraan
+
+# ✅ Daftar kelas yang dideteksi: MANUSIA + KENDARAAN
+KELAS_TARGET = {
+    0: 'orang',
+    2: 'mobil', 
+    3: 'sepeda motor', 
+    5: 'bus', 
+    7: 'truk'
+}
+
+# ---------------- FUNGSI UBAH PERSPEKTIF ----------------
+def ubah_pandangan_burung(titik, matriks_transformasi):
+    titik = np.array([titik], dtype=np.float32).reshape(-1,1,2)
+    titik_baru = cv2.perspectiveTransform(titik, matriks_transformasi)
+    return tuple(titik_baru[0][0].astype(int))
+
+def buat_matriks_jalan(lebar_jalan, tinggi_jalan, titik_sumber):
+    titik_tujuan = np.float32([
+        [0, 0],
+        [lebar_jalan, 0],
+        [0, tinggi_jalan],
+        [lebar_jalan, tinggi_jalan]
+    ])
+    return cv2.getPerspectiveTransform(titik_sumber, titik_tujuan)
+
+# ---------------- FUNGSI HITUNG KECEPATAN ----------------
+def hitung_kecepatan(riwayat_posisi, jarak_meter_per_piksel, fps):
+    if len(riwayat_posisi) < 2:
+        return 0
+    
+    x1, y1 = riwayat_posisi[-2]
+    x2, y2 = riwayat_posisi[-1]
+    
+    jarak_piksel = np.sqrt((x2-x1)**2 + (y2-y1)**2)
+    jarak_meter = jarak_piksel * jarak_meter_per_piksel
+    
+    waktu = 1 / fps
+    
+    kecepatan_ms = jarak_meter / waktu
+    kecepatan_kph = kecepatan_ms * 3.6
+    
+    return round(kecepatan_kph, 1)
+
+# ---------------- FUNGSI KETERANGAN GERAKAN MANUSIA ----------------
+def jenis_gerakan(kecepatan):
+    if kecepatan < 1:
+        return "Diam"
+    elif kecepatan <= SPEED_WALK:
+        return "Jalan"
+    elif kecepatan <= SPEED_RUN:
+        return "Lari"
+    else:
+        return "Bergerak Cepat"
+
+# ---------------- KONFIGURASI AREA JALAN ----------------
+titik_jalan_sumber = np.float32([
+    (300, 250),   # Kiri Atas
+    (950, 250),   # Kanan Atas
+    (1920, 1080), # Kanan Bawah
+    (0, 1080)     # Kiri Bawah
+])
+
+LEBAR_JALAN_METER = 12
+PANJANG_JALAN_METER = 50
+
+LEBAR_TAMPILAN = 500
+TINGGI_TAMPILAN = 800
+matriks_transform = buat_matriks_jalan(LEBAR_TAMPILAN, TINGGI_TAMPILAN, titik_jalan_sumber)
+jarak_meter_per_piksel = PANJANG_JALAN_METER / TINGGI_TAMPILAN
+
+data_kendaraan = {}
+
+# ---------------- UJI COBA DENGAN VIDEO ----------------
+sumber_video = 'jalanraya.mp4'
+
+# ✅ Ganti tautan video contoh yang bisa diakses
+import urllib.request
+try:
+    urllib.request.urlretrieve('https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4', 'jalanraya.mp4')
+except:
+    print("Gagal unduh contoh video, silakan unggah video Anda sendiri")
+
+video = cv2.VideoCapture(sumber_video)
+fps = video.get(cv2.CAP_PROP_FPS)
+lebar = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+tinggi = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+while video.isOpened():
+    berhasil, bingkai = video.read()
+    if not berhasil:
+        break
+
+    hasil = model(bingkai, classes=list(KELAS_TARGET.keys()), conf=0.3, verbose=False)
+    deteksi = []
+
+    for kotak in hasil[0].boxes:
+        x1, y1, x2, y2 = kotak.xyxy[0].cpu().numpy()
+        kepercayaan = kotak.conf[0].cpu().numpy()
+        kelas = int(kotak.cls[0].cpu().numpy())
+        deteksi.append(([x1, y1, x2-x1, y2-y1], kepercayaan, kelas))
+
+    objek_dilacak = pelacak.update_tracks(deteksi, frame=bingkai)
+
+    for objek in objek_dilacak:
+        if not objek.is_confirmed() or objek.time_since_update > 1:
+            continue
+        
+        id_objek = objek.track_id
+        kotak = objek.to_ltrb()
+        x1, y1, x2, y2 = map(int, kotak)
+        kelas_objek = int(objek.det_class)
+        
+        # Titik tengah bawah objek
+        titik_tengah = (int((x1+x2)/2), int(y2))
+        titik_burung = ubah_pandangan_burung(titik_tengah, matriks_transform)
+
+        # Simpan riwayat posisi
+        if id_objek not in data_kendaraan:
+            data_kendaraan[id_objek] = {
+                'kelas': kelas_objek,
+                'posisi_burung': [],
+                'kecepatan': 0
+            }
+        
+        data_kendaraan[id_objek]['posisi_burung'].append(titik_burung)
+        if len(data_kendaraan[id_objek]['posisi_burung']) > HISTORY_LEN:
+            data_kendaraan[id_objek]['posisi_burung'].pop(0)
+
+        # Hitung kecepatan
+        if len(data_kendaraan[id_objek]['posisi_burung']) >= MIN_TRACK_FRAMES:
+            kecepatan = hitung_kecepatan(
+                data_kendaraan[id_objek]['posisi_burung'],
+                jarak_meter_per_piksel,
+                fps
+            )
+            
+            if MIN_PIXEL_DIST < kecepatan < MAX_ALLOWED_KPH:
+                data_kendaraan[id_objek]['kecepatan'] = kecepatan
+        
+        kecepatan_akhir = data_kendaraan[id_objek]['kecepatan']
+        nama_objek = KELAS_TARGET[kelas_objek]
+
+        # ✅ Atur warna dan tulisan berbeda untuk manusia & kendaraan
+        if nama_objek == 'orang':
+            gerakan = jenis_gerakan(kecepatan_akhir)
+            if kecepatan_akhir < 1:
+                warna = (255, 255, 0) # Kuning diam
+            elif kecepatan_akhir <= SPEED_WALK:
+                warna = (0, 255, 0) # Hijau jalan
+            else:
+                warna = (0, 165, 255) # Oranye lari
+            teks = f"{nama_objek} | {gerakan} | {kecepatan_akhir} km/h"
+        
+        else:
+            if kecepatan_akhir < SPEED_GREEN:
+                warna = (0, 255, 0) # Hijau aman
+            elif kecepatan_akhir < SPEED_YELLOW:
+                warna = (0, 255, 255) # Kuning peringatan
+            else:
+                warna = (0, 0, 255) # Merah berbahaya
+            teks = f"{nama_objek} | {kecepatan_akhir} km/h"
+
+        # Gambar kotak dan tulisan
+        cv2.rectangle(bingkai, (x1,y1), (x2,y2), warna, 2)
+        cv2.putText(bingkai, teks, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, warna, 2)
+
+    # Tampilkan hasil
+    cv2_imshow(bingkai)
+
+video.release()
