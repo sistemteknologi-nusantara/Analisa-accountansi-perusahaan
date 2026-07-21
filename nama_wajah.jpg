@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Nama dari Foto - Sistem Lengkap</title>
+    <!-- Pustaka AI -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f0f4f8;
+            padding: 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1e40af;
+            margin-bottom: 15px;
+        }
+        .kotak {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        input, button {
+            padding: 12px 20px;
+            margin: 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 16px;
+        }
+        button {
+            background: #1e40af;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+        #preview {
+            max-width: 300px;
+            border-radius: 10px;
+            margin: 15px auto;
+            display: none;
+            border: 2px solid #e2e8f0;
+        }
+        .hasil {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+        }
+        .siap { background: #dcfce7; color: #166534; }
+        .proses { background: #fff7ed; color: #c2410c; }
+        .ketemu { background: #dbeafe; color: #1e40af; }
+        .tidak { background: #fef2f2; color: #dc2626; }
+        .info {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.7;
+            text-align: left;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        .peringatan {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            margin: 15px 0;
+            text-align: left;
+            font-size: 14px;
+            color: #92400e;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🔍 Cari Nama dari Foto</h1>
+
+<div class="peringatan">
+    ⚠️ <strong>Penting:</strong> Sistem ini hanya bisa mengenali orang yang datanya sudah dimasukkan sebelumnya. Tidak bisa mengetahui nama orang asing secara ajaib.
+</div>
+
+<div class="kotak">
+    <div class="hasil proses" id="status">⏳ Sedang memuat sistem pintar...</div>
+
+    <input type="file" id="unggah_foto" accept="image/*">
+    <br>
+    <img id="preview" alt="Pratinjau Foto">
+    <br>
+    <button id="tombol_cari">🔎 Cari Nama</button>
+
+    <div class="hasil" id="tampil_hasil"></div>
+
+    <div class="info">
+        📝 <strong>Cara Kerja & Persiapan:</strong><br>
+        1. Simpan foto wajah orang yang dicari dengan nama yang sesuai, contoh: <b>wajah_jaha.jpg</b> di folder yang sama dengan file ini<br>
+        2. Ubah nama di bagian daftar orang dalam kode jika ingin menambah orang lain<br>
+        3. Pilih foto yang ingin diperiksa<br>
+        4. Klik tombol Cari Nama<br>
+        5. Hasil berupa nama dan persentase tingkat kecocokan
+    </div>
+</div>
+
+<script>
+// ============== DAFTAR ORANG YANG SUDAH DIKETAHUI ==============
+// Tambah atau ubah nama dan nama file foto di sini
+const DAFTAR_ORANG = [
+    {nama: "Jaha", file: "wajah_jaha.jpg"}
+    // Contoh tambahan: , {nama: "Budi", file: "wajah_budi.jpg"}
+];
+
+let deskripsi_wajah_tersimpan = [];
+let foto_terpilih = null;
+
+// ============== MEMUAT MODEL AI ==============
+async function muatModel() {
+    try {
+        // Alamat sumber model yang sudah diperbaiki agar bisa diakses
+        const alamatModel = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model/";
+        await faceapi.nets.ssdMobilenetv1.loadFromUri(alamatModel);
+        await faceapi.nets.faceLandmark68Net.loadFromUri(alamatModel);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(alamatModel);
+        
+        document.getElementById('status').textContent = "✅ Sistem siap! Silakan gunakan";
+        document.getElementById('status').className = "hasil siap";
+
+        // Memuat data wajah yang sudah terdaftar
+        for(let orang of DAFTAR_ORANG){
+            try{
+                const img = await faceapi.fetchImage(orang.file);
+                const deteksi = await faceapi.detectSingleFace(img)
+                                            .withFaceLandmarks()
+                                            .withFaceDescriptor();
+                if(deteksi){
+                    deskripsi_wajah_tersimpan.push({
+                        nama: orang.nama,
+                        deskripsi: deteksi.descriptor
+                    });
+                    console.log(`✅ Data ${orang.nama} berhasil dimuat`);
+                } else {
+                    console.log(`⚠️ Tidak ada wajah yang terdeteksi di foto ${orang.file}`);
+                }
+            }catch(e){
+                console.log(`❌ Gagal memuat ${orang.nama}:`, e.message);
+            }
+        }
+
+        if(deskripsi_wajah_tersimpan.length === 0){
+            document.getElementById('status').textContent = "⚠️ Siap, tapi belum ada data wajah yang dimuat";
+            document.getElementById('status').className = "hasil proses";
+        }
+
+    } catch (err) {
+        document.getElementById('status').textContent = "⚠️ Sebagian fitur terbatas: " + err.message;
+        console.log("Kesalahan memuat model:", err);
+    }
+}
+
+// ============== MENAMPILKAN FOTO YANG DIPILIH ==============
+document.getElementById('unggah_foto').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async function(e){
+        foto_terpilih = await faceapi.fetchImage(e.target.result);
+        const pratinjau = document.getElementById('preview');
+        pratinjau.src = foto_terpilih.src;
+        pratinjau.style.display = 'block';
+        document.getElementById('tampil_hasil').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+});
+
+// ============== PROSES PENCARIAN NAMA ==============
+document.getElementById('tombol_cari').addEventListener('click', async () => {
+    if(!foto_terpilih){
+        alert("Silakan pilih foto terlebih dahulu!");
+        return;
+    }
+    if(deskripsi_wajah_tersimpan.length === 0){
+        alert("Belum ada data wajah yang disimpan!\nPastikan file foto referensi sudah ada di folder yang sama.");
+        return;
+    }
+
+    const tampil_hasil = document.getElementById('tampil_hasil');
+    tampil_hasil.style.display = 'block';
+    tampil_hasil.textContent = "🔍 Sedang membandingkan wajah...";
+    tampil_hasil.className = "hasil proses";
+
+    try {
+        const deteksi = await faceapi.detectSingleFace(foto_terpilih)
+                                    .withFaceLandmarks()
+                                    .withFaceDescriptor();
+
+        if(!deteksi){
+            tampil_hasil.textContent = "❌ Tidak ditemukan wajah pada foto";
+            tampil_hasil.className = "hasil tidak";
+            return;
+        }
+
+        let nama_terbaik = "Tidak Diketahui";
+        let skor_terbaik = 0;
+        const AMBANG_BATAS = 0.6; // Semakin kecil semakin ketat
+
+        for(let i=0; i<deskripsi_wajah_tersimpan.length; i++){
+            const jarak = faceapi.utils.euclideanDistance(deteksi.descriptor, deskripsi_wajah_tersimpan[i].deskripsi);
+            const skor = 1 - jarak;
+            if(skor > skor_terbaik && skor >= (1 - AMBANG_BATAS)){
+                skor_terbaik = skor;
+                nama_terbaik = deskripsi_wajah_tersimpan[i].nama;
+            }
+        }
+
+        if(nama_terbaik !== "Tidak Diketahui"){
+            tampil_hasil.innerHTML = `✅ <strong>Nama yang Ditemukan: ${nama_terbaik}</strong><br>Tingkat Kecocokan: ${Math.round(skor_terbaik*100)}%`;
+            tampil_hasil.className = "hasil ketemu";
+        } else {
+            tampil_hasil.innerHTML = "❌ Wajah ini belum ada dalam daftar data";
+            tampil_hasil.className = "hasil tidak";
+        }
+
+    } catch (err) {
+        tampil_hasil.textContent = "⚠️ Terjadi kesalahan: " + err.message;
+        tampil_hasil.className = "hasil tidak";
+        console.log("Kesalahan proses:", err);
+    }
+});
+
+// Jalankan sistem saat halaman dibuka
+muatModel();
+</script>
+
+</body>
+</html>
