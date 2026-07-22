@@ -64,7 +64,7 @@ perintah_sebelumnya = ""
 try:
     import lcd_api
     i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=400000)
-    lcd = lcd_api.I2cLcd(i2c, 2, 16)
+    lcd = lcd_api.I2cLcd(i2c, 2, 16, i2c_addr=0x3F) 
     
     def tampil_lcd(baris1, baris2=""):
         lcd.clear()
