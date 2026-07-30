@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔧 Panel Pengembang + Rekam Otomatis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent;}
+        html, body {
+            background: #000000;
+            font-family: system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ✅ PANEL UTAMA SEBELAH KIRI */
+        .panel-pengembang {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 33vw;
+            height: 100%;
+            background: linear-gradient(100deg, #050510, #000000);
+            border-radius: 0 32px 32px 0;
+            border-top: 4px solid #c084fc;
+            border-right: 4px solid #a855f7;
+            border-bottom: 4px solid #c084fc;
+            box-shadow: 6px 0 40px rgba(168, 85, 247, 0.45);
+            transform: translateX(-100%);
+            transition: transform 0.35s ease-out;
+            z-index: 99999;
+            padding: 55px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .panel-pengembang.terbuka {transform: translateX(0);}
+
+        .wadah-tombol {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 8px;
+        }
+        .tombol {
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.15s;
+        }
+        .tombol:active {transform: scale(0.95);}
+
+        .hijau {background: #22c55e; color: white;}
+        .oranye {background: #f97316; color: white;}
+        .biru {background: #3b82f6; color: white;}
+        .ungu {background: #8b5cf6; color: white;}
+        .abu {background: #6b7280; color: white;}
+
+        .garis-sentuh {
+            position: fixed;
+            top: 0; left: 0;
+            width: 14px; height: 100%;
+            z-index: 99998;
+        }
+    </style>
+</head>
+<body>
+
+<div class="garis-sentuh"></div>
+
+<div class="panel-pengembang" id="panelUtama">
+    <div class="wadah-tombol">
+        <button class="tombol hijau" onclick="geserSedikitAtas()">↑ Sedikit</button>
+        <button class="tombol oranye" onclick="geserSedikitBawah()">↓ Sedikit</button>
+        <button class="tombol biru" onclick="kePalingAwal()">⬆ Atas</button>
+        <button class="tombol biru" onclick="kePalingAkhir()">⬇ Bawah</button>
+        <!-- ✅ TOMBOL BARU GERAKAN SANTAI -->
+        <button class="tombol abu" onclick="keAwalSantai()">🔉 Santai Atas</button>
+        <button class="tombol abu" onclick="keAkhirSantai()">🔉 Santai Bawah</button>
+        <button class="tombol ungu" onclick="ubahLaju()">Laju: <span id="tampilLaju">Biasa</span></button>
+    </div>
+</div>
+
+<script>
+let nyala = false;
+let mulai = 0;
+let jarakGeser = 0;
+let sedangJalan = false;
+let kecepatan = 1.5;
+let daftarLaju = [0.6, 1.5, 2.8, 4.2];
+let namaLaju = ["Pelan", "Biasa", "Cepat", "Paling"];
+let urutan = 1;
+
+async function kunciLayarNyala() {
+    try { if('wakeLock' in navigator) { let kunci = await navigator.wakeLock.request('screen'); kunci.addEventListener('release', ()=>{if(sedangJalan) kunciLayarNyala();}); } }
+    catch(err){}
+}
+
+function mulaiJalanOtomatis() {
+    if(!sedangJalan) {
+        sedangJalan = true;
+        gulirTerus();
+    }
+}
+
+function gulirTerus() { if(!sedangJalan) return; window.scrollBy({top: kecepatan, left:0}); setTimeout(gulirTerus, 30); }
+function berhenti() { sedangJalan = false; }
+function geserSedikitAtas() { window.scrollBy({top:-30, left:0, behavior:'smooth'}); }
+function geserSedikitBawah() { window.scrollBy({top:30, left:0, behavior:'smooth'}); }
+
+function kePalingAwal() {
+    berhenti();
+    window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
+}
+
+function kePalingAkhir() {
+    berhenti();
+    window.scrollTo({top: document.body.scrollHeight, left: 0, behavior: 'smooth'});
+}
+
+// ✅ GERAKAN SANTAI LEBIH LAMBAT DAN LEMBUT
+function keAwalSantai() {
+    berhenti();
+    window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+}
+
+function keAkhirSantai() {
+    berhenti();
+    window.scrollTo({top: document.body.scrollHeight, left: 0, behavior: 'auto'});
+}
+
+function ubahLaju() { urutan = (urutan+1) % daftarLaju.length; kecepatan = daftarLaju[urutan]; tampilLaju.innerText = namaLaju[urutan]; }
+
+document.addEventListener('touchstart', e=>{
+    mulai = e.touches[0].clientX;
+    jarakGeser = 0;
+});
+
+document.addEventListener('touchmove', e=>{
+    let skrg = e.touches[0].clientX;
+    jarakGeser = skrg - mulai;
+});
+
+document.addEventListener('touchend', ()=>{
+    if(jarakGeser > 80 && !nyala) {
+        buka();
+        mulaiJalanOtomatis();
+    }
+    else if(jarakGeser < -80 && nyala) tutup();
+});
+
+function buka() { panelUtama.classList.add('terbuka'); nyala = true; }
+function tutup() { panelUtama.classList.remove('terbuka'); nyala = false; berhenti(); }
+
+window.onload = () => { kunciLayarNyala(); };
+</script>
+
+</body>
+</html>
