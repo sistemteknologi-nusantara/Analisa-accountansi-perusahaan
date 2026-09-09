@@ -1050,3 +1050,309 @@ function kembali() {
 </body>
 </html>
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERSIB BANDUNG • Skuad & Resmi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body { background-color: #121217; color: #f3f4f6; font-family: 'Segoe UI', Roboto, sans-serif; }
+        .section-title { color: #a1a1aa; font-size: 18px; font-weight: 500; margin: 24px 0 12px; }
+        .player-row { @apply flex items-center justify-between px-4 py-3 border-b border-gray-800/60 hover:bg-gray-800/40 transition; }
+        .player-left { @apply flex items-center gap-3; }
+        .player-avatar { width: 44px; height: 44px; border-radius: 50%; background: #1f2937; object-fit: cover; }
+        .country-flag { width: 20px; height: 15px; border-radius: 2px; display:inline-block; margin-left:6px; }
+        .link-block { @apply bg-gray-800/50 p-4 rounded-xl mb-3 hover:bg-gray-700/50 transition; }
+        .badge-pos { @apply text-xs px-2 py-0.5 rounded bg-green-900/50 text-green-300; }
+    </style>
+</head>
+<body class="max-w-lg mx-auto pb-12">
+
+<!-- Header -->
+<header class="sticky top-0 z-20 bg-gray-950/90 backdrop-blur px-5 py-4 border-b border-gray-800 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+        <img src="https://upload.wikimedia.org/wikipedia/id/thumb/7/73/Persib_Bandung_logo.svg/100px-Persib_Bandung_logo.svg.png" class="w-9 h-9" alt="Logo">
+        <span class="font-bold text-lg">PERSIB BANDUNG</span>
+    </div>
+    <div class="flex gap-3 text-lg">
+        <a href="https://persib.co.id" target="_blank" class="text-gray-300 hover:text-white"><i class="fa fa-globe"></i></a>
+        <a href="https://linktr.ee/persibofficial" target="_blank" class="text-gray-300 hover:text-white"><i class="fa fa-share-alt"></i></a>
+    </div>
+</header>
+
+<!-- Navigasi Cepat -->
+<nav class="bg-gray-900/50 px-4 py-3 flex gap-4 overflow-x-auto text-sm border-b border-gray-800">
+    <a href="#berita" class="whitespace-nowrap text-gray-300 hover:text-white">Berita & Jadwal</a>
+    <a href="#skuad" class="whitespace-nowrap text-white font-semibold border-b border-white pb-0.5">Skuad Pemain</a>
+    <a href="#tautan" class="whitespace-nowrap text-gray-300 hover:text-white">Tautan Resmi</a>
+</nav>
+
+<main class="px-4">
+
+<!-- SKUAD LENGKAP SESUAI GAMBAR -->
+<h1 id="skuad" class="text-2xl font-bold mt-6 mb-2">Daftar Pemain</h1>
+
+<!-- KIPER -->
+<h2 class="section-title">Kiper</h2>
+<div class="bg-gray-900/30 rounded-lg overflow-hidden">
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>
+                <div class="font-semibold">Teja Paku Alam <span class="text-gray-400">#14</span></div>
+                <div class="text-sm text-gray-400">Indonesia <span class="country-flag bg-red-600"></span></div>
+            </div>
+        </div>
+        <span>32</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar bg-gray-600 flex items-center justify-center">👤</div>
+            <div>Rhaka Bilhuda <span class="text-gray-400">#60</span></div>
+        </div>
+        <span>18</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>
+                <div class="font-semibold">Fitrah Maulana <span class="text-gray-400">#81</span></div>
+                <div class="text-sm text-gray-400">Indonesia <span class="country-flag bg-red-600"></span></div>
+            </div>
+        </div>
+        <span>20</span>
+    </div>
+</div>
+
+<!-- PEMAIN BERTAHAN -->
+<h2 class="section-title">Pemain bertahan</h2>
+<div class="bg-gray-900/30 rounded-lg overflow-hidden">
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-green-800">📷</div>
+            <div>Gabriel Mutombo <span class="text-gray-400">#3</span><br><span class="text-sm text-gray-400">Prancis 🇫🇷</span></div>
+        </div>
+        <span>30</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Júlio César de Freitas Filho <span class="text-gray-400">#4</span></div>
+        </div>
+        <span>31</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Kakang Rudianto <span class="text-gray-400">#5</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>23</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Henhen Herdiana <span class="text-gray-400">#12</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>30</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Faris Abdul Hafizh <span class="text-gray-400">#21</span></div>
+        </div>
+        <span>23</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Danijel Lončar <span class="text-gray-400">#22</span><br><span class="text-sm text-gray-400">Kroasia 🇭🇷</span></div>
+        </div>
+        <span>29</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Al Hamra Hehanussa <span class="text-gray-400">#29</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>27</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Dion Markx <span class="text-gray-400">#44</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>21</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Patricio Matricardi <span class="text-gray-400">#48</span><br><span class="text-sm text-gray-400">Argentina 🇦🇷</span></div>
+        </div>
+        <span>32</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Kevin Pasha <span class="text-gray-400">#66</span></div>
+        </div>
+        <span>19</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Zulkifli Lukmansyah <span class="text-gray-400">#73</span></div>
+        </div>
+        <span>20</span>
+    </div>
+</div>
+
+<!-- GELANDANG -->
+<h2 class="section-title">Gelandang</h2>
+<div class="bg-gray-900/30 rounded-lg overflow-hidden">
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-green-700">📷</div>
+            <div>Ellano Reijnders <span class="text-gray-400">#2</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>25</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Sandy Walsh <span class="text-gray-400">#6</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>31</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Beckham Putra <span class="text-gray-400">#7</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>24</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Luciano Guaycochea <span class="text-gray-400">#8</span><br><span class="text-sm text-gray-400">Argentina 🇦🇷</span></div>
+        </div>
+        <span>34</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Dedi Kusnandar <span class="text-gray-400">#11</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>35</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Febri Hariyadi <span class="text-gray-400">#13</span><br><span class="text-sm text-gray-400">Indonesia U-23</span></div>
+        </div>
+        <span>30</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Gakuto Notsuda <span class="text-gray-400">#17</span><br><span class="text-sm text-gray-400">Jepang 🇯🇵</span></div>
+        </div>
+        <span>32</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Adam Alis <span class="text-gray-400">#18</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>32</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Marc Klok <span class="text-gray-400">#23</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>33</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Thom Haye <span class="text-gray-400">#33</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>31</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Ikhwan Tanamal <span class="text-gray-400">#40</span><br><span class="text-sm text-gray-400">Australasia</span></div>
+        </div>
+        <span>22</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Saddil Ramdani <span class="text-gray-400">#67</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>27</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Adzikry Fadlillah <span class="text-gray-400">#71</span><br><span class="text-sm text-gray-400">Indonesia</span></div>
+        </div>
+        <span>23</span>
+    </div>
+    <div class="player-row">
+        <div class="player-left">
+            <div class="player-avatar flex items-center justify-center bg-gray-700">📷</div>
+            <div>Ragnar Oratmangoen <span class="text-gray-400">#77</span></div>
+        </div>
+        <span>28</span>
+    </div>
+</div>
+
+<!-- BERITA & JADWAL -->
+<section id="berita" class="mt-10">
+    <h2 class="text-xl font-bold mb-4">📢 Berita & Jadwal Terkini</h2>
+    <div class="link-block">
+        <p class="text-sm text-gray-400 mb-1">09 Sep 2026 • 19:48</p>
+        <h3 class="font-semibold">Tolic Fokus Persiapkan Tim Jelang Hadapi Persija</h3>
+    </div>
+    <div class="link-block">
+        <p class="text-sm text-gray-400 mb-1">09 Sep 2026 • 17:12</p>
+        <h3 class="font-semibold">Sempat Minta Izin ke Belanda, Reijnders Kembali Berlatih</h3>
+    </div>
+    <div class="link-block bg-green-900/20 border border-green-800/50">
+        <p class="text-green-300 font-semibold mb-2">⚽ Pertandingan Selanjutnya: Sabtu, 12 Sep • 16:30 • Gbk</p>
+        <p class="text-sm">Persija Jakarta 🆚 PERSIB Bandung</p>
+    </div>
+</section>
+
+<!-- TAUTAN RESMI -->
+<section id="tautan" class="mt-10">
+    <h2 class="text-xl font-bold mb-4">🔗 Tautan Resmi</h2>
+    <a href="https://persib.co.id" target="_blank" class="link-block block">
+        <i class="fa fa-globe text-green-400 mr-2"></i> Website Utama & Jadwal Lengkap
+    </a>
+    <a href="https://linktr.ee/persibofficial" target="_blank" class="link-block block">
+        <i class="fa fa-link text-blue-400 mr-2"></i> Linktree: Toko, App, Nobar & Medsos
+    </a>
+    <a href="https://www.tiktok.com/@persib" target="_blank" class="link-block block">
+        <i class="fa fa-music text-pink-400 mr-2"></i> TikTok Resmi (8.9 Juta Pengikut)
+    </a>
+    <div class="grid grid-cols-3 gap-3 mt-4 text-center text-sm">
+        <a href="https://ileague.id" target="_blank" class="bg-gray-800/50 p-3 rounded-lg">iLeague.id</a>
+        <a href="https://www.indosiar.com" target="_blank" class="bg-gray-800/50 p-3 rounded-lg">Indosiar</a>
+        <a href="https://m.vidio.com" target="_blank" class="bg-gray-800/50 p-3 rounded-lg">Vidio</a>
+    </div>
+</section>
+
+</main>
+
+<footer class="mt-12 border-t border-gray-800 text-center text-sm text-gray-500 py-6">
+    Wilujeng Sumping • Data Skuad & Jadwal: persib.co.id • Tampilan gaya aplikasi seluler
+</footer>
+
+</body>
+</html>
