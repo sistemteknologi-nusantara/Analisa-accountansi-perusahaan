@@ -496,4 +496,584 @@ function kembali() {
 </body>
 </html>
 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubah Akun • PERSIB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            min-height: 100vh;
+        }
+        .row-item {
+            @apply flex items-center justify-between bg-white px-4 py-4 border-b border-gray-100 active:bg-gray-50 transition-colors;
+        }
+        .danger { @apply text-red-600; }
+        .label { @apply text-gray-500 text-sm mb-1; }
+        .value { @apply text-gray-800 font-medium; }
+    </style>
+</head>
+<body class="max-w-lg mx-auto bg-gray-50">
+
+    <!-- Header -->
+    <div class="bg-white flex items-center px-4 py-3 shadow-sm sticky top-0 z-10">
+        <a href="#" class="text-xl mr-4"><i class="fa fa-arrow-left text-gray-700"></i></a>
+        <h1 class="text-xl font-semibold text-gray-800">Ubah Akun</h1>
+    </div>
+
+    <main class="pb-10">
+        <!-- Informasi Pribadi -->
+        <section class="mt-3 bg-white">
+            <h2 class="px-4 py-3 text-gray-700 font-semibold">Informasi Pribadi</h2>
+
+            <div class="row-item">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+                        <img src="https://i.pravatar.cc/150?img=68" alt="Foto Profil" class="w-full h-full object-cover">
+                    </div>
+                    <span class="font-medium text-gray-800">Foto Profil</span>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div>
+                    <div class="label">Nama</div>
+                    <div class="value">FADLI IFAN SYAH</div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div>
+                    <div class="label">Nomor Ponsel</div>
+                    <div class="value">+62 882 0078 6913</div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div>
+                    <div class="label">Alamat Email</div>
+                    <div class="value">fadlitegalhams@gmail.com</div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div>
+                    <div class="label">Kontak Darurat</div>
+                    <div class="value text-sm">1 dari 3 kontak sudah ditambahkan</div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <!-- Alamat / Lokasi -->
+            <div class="row-item">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-lg text-green-600">
+                        <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium">Ubah Alamat & Tempat Tinggal</div>
+                        <div class="text-sm text-gray-500">Pindah ke lokasi baru</div>
+                    </div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+        </section>
+
+        <!-- Bagian Baru: Tiket & Jadwal PERSIB -->
+        <section class="mt-4 bg-white">
+            <h2 class="px-4 py-3 text-gray-700 font-semibold">Tiket & Pertandingan</h2>
+
+            <div class="row-item">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                        <i class="fa fa-ticket"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium">Tiket Saya</div>
+                        <div class="text-sm text-gray-500">Daftar tiket yang sudah dibeli</div>
+                    </div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium">Jadwal Pertandingan PERSIB</div>
+                        <div class="text-sm text-gray-500">Lihat jadwal mendatang & hasil</div>
+                    </div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+
+            <div class="row-item">
+                <div>
+                    <div class="label">Dokumen & Pembelian</div>
+                    <div class="value">riwayat tiket</div>
+                </div>
+                <i class="fa fa-chevron-right text-gray-400"></i>
+            </div>
+        </section>
+
+        <!-- Tindakan Akun -->
+        <section class="mt-4 bg-white mb-6">
+            <h2 class="px-4 py-3 text-gray-700 font-semibold">Pengaturan Akun</h2>
+
+            <a href="#" class="row-item">
+                <div class="flex items-center gap-3">
+                    <i class="fa fa-sign-out text-gray-500 w-5 text-center"></i>
+                    <span>Keluar / Logout</span>
+                </div>
+            </a>
+
+            <a href="#" class="row-item danger border-b-0">
+                <div class="flex items-center gap-3">
+                    <i class="fa fa-trash w-5 text-center"></i>
+                    <span class="font-medium">Hapus Akun Secara Permanen</span>
+                </div>
+            </a>
+        </section>
+    </main>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pertandingan • PERSIB • Maung Aing </title>
+    <style>
+        *{margin:0; padding:0; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif;}
+        body{background:#121217; color:#ffffff; max-width:750px; margin:0 auto;}
+
+        /* Header Atas */
+        .top-bar{
+            background:#0f0f14; display:flex; align-items:center; justify-content:space-between;
+            padding:12px 16px; border-bottom:1px solid #222; position:sticky; top:0; z-index:10;
+        }
+        .logo-goal{font-size:24px; font-weight:900; font-style:italic;}
+        .top-actions{display:flex; gap:10px; align-items:center;}
+        .btn-live{background:#0e82d1; border-radius:20px; padding:6px 14px; font-size:15px; font-weight:bold; display:flex; align-items:center; gap:6px;}
+        .btn-tiket{background:#22262f; border-radius:20px; padding:6px 14px; font-size:15px;}
+        .icon{font-size:22px;}
+
+        /* Header Klub */
+        .club-header{padding:20px 16px; background:#17171d; position:relative; overflow:hidden;}
+        .club-bg{opacity:0.08; position:absolute; left:0; top:0; width:100%; height:100%; background:#ddd;}
+        .club-info{position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center;}
+        .club-name{font-size:28px; font-weight:bold;}
+        .club-logo{width:45px; height:45px;}
+        .nav-tabs{display:flex; gap:30px; margin-top:15px; overflow-x:auto; padding-bottom:4px;}
+        .tab{white-space:nowrap; font-size:17px; color:#b0b0b8; padding-bottom:6px; border-bottom:2px solid transparent;}
+        .tab.active{color:#fff; border-bottom-color:#fff; font-weight:500;}
+
+        /* Daftar Pertandingan */
+        .content{padding:10px 16px;}
+        .month-title{font-size:19px; font-weight:bold; margin:25px 0 12px; color:#e0e0e6;}
+        .match-item{
+            display:flex; justify-content:space-between; align-items:center;
+            padding:14px 12px; border-bottom:1px solid #1f1f26; background:#1a1a20;
+        }
+        .match-left{}
+        .league{font-size:15px; color:#aaa; margin-bottom:8px;}
+        .team{display:flex; align-items:center; gap:8px; margin:4px 0; font-size:17px;}
+        .team-logo{width:26px; height:26px; border-radius:50%; flex-shrink:0;}
+        .score-cell{text-align:right; font-size:18px; font-weight:500;}
+        .ft-tag{font-size:13px; color:#999; margin-top:2px;}
+    </style>
+</head>
+<body>
+
+<!-- Baris Paling Atas -->
+<div class="top-bar">
+    <div style="display:flex; align-items:center; gap:20px;">
+        <span class="logo-goal">GOAL</span>
+    </div>
+    <div class="top-actions">
+        <span class="btn-live">🐯 Live</span>
+        <span class="btn-tiket"> Tiket</span>
+        <span class="icon">👤</span>
+        <span class="icon">☰</span>
+    </div>
+</div>
+
+<!-- Navigasi Tab Atas -->
+<div style="background:#0f0f14; padding:10px 16px; display:flex; gap:28px; overflow-x:auto; border-bottom:1px solid #222;">
+    <span style="font-size:19px; color:#aaa;">Berita</span>
+    <span style="font-size:19px; color:#aaa;">Video</span>
+    <span style="font-size:19px; color:#fff; font-weight:bold; border-bottom:2px solid #fff; padding-bottom:8px;">Pertandingan</span>
+    <span style="font-size:19px; color:#aaa;">Skuad</span>
+    <span style="font-size:19px; color:#aaa;">Klasemen</span>
+</div>
+
+<!-- Bagian Kepala PERSIB -->
+<div class="club-header">
+    <div class="club-bg"></div>
+    <div class="club-info">
+        <span class="club-name">PERSIB BANDUNG</span>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <img class="club-logo" src="https://upload.wikimedia.org/wikipedia/id/thumb/7/73/Persib_Bandung_logo.svg/100px-Persib_Bandung_logo.svg.png" alt="PERSIB">
+            <span style="font-size:22px;">☆</span>
+        </div>
+    </div>
+</div>
+
+<!-- Isi Jadwal -->
+<div class="content">
+
+    <!-- SEPTEMBER -->
+    <h2 class="month-title">September 2026</h2>
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">06 Sep • Super League</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"> </span> Persib Bandung</div>
+            <div class="team"><span class="team-logo" style="background:#b91c1c;"> </span> PSM Makassar</div>
+        </div>
+        <div class="score-cell">
+            <div>3 — 1</div>
+            <div class="ft-tag">FT</div>
+        </div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">12 Sep • Super League</div>
+            <div class="team"><span class="team-logo" style="background:#fff; color:red;"> </span> Persija Jakarta</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"> </span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">15.30</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">16 Sep • AFC Champions League Two</div>
+            <div class="team"><span class="team-logo" style="background:#92400e;"> </span> FC Seoul</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"> </span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">17.00</div>
+    </div>
+
+    <!-- OKTOBER -->
+    <h2 class="month-title">October 2026</h2>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">11 Okt • Super League</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> Dewa United FC</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">14 Okt • AFC Champions League Two</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo" style="background:#b91c1c;"></span> Viettel</div>
+        </div>
+        <div class="score-cell">17.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">18 Okt • Super League</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> Persik</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">22 Okt • Super League</div>
+            <div class="team"><span class="team-logo" style="background:#dc2626;"></span> Madura United</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">26 Okt • Super League</div>
+            <div class="team"><span class="team-logo"></span> Garudayaksa FC</div>
+            <div class="team"><span class="team-logo" style="background:#23a044;"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">15.30</div>
+    </div>
+
+    <!-- NOVEMBER -->
+    <h2 class="month-title">November 2026</h2>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">01 Nov • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> Isenmulang Kalteng</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">04 Nov • AFC Champions League Two</div>
+            <div class="team"><span class="team-logo"></span> Melbourne Victory</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">15.45</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">08 Nov • Super League</div>
+            <div class="team"><span class="team-logo"></span> Java United F.C.</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">22 Nov • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> Bali United FC</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">25 Nov • AFC Champions League Two</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> FC Seoul</div>
+        </div>
+        <div class="score-cell">18.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">29 Nov • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persita</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <!-- DESEMBER -->
+    <h2 class="month-title">December 2026</h2>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">02 Des • AFC Champions League Two</div>
+            <div class="team"><span class="team-logo"></span> Viettel</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">18.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">06 Des • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persebaya Surabaya</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">15.30</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">14 Des • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> PSS Sleman</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">20 Des • Super League</div>
+            <div class="team"><span class="team-logo"></span> Arema</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">23 Des • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> Bhayangkara Presisi Indonesia FC</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+    <div class="match-item">
+        <div class="match-left">
+            <div class="league">27 Des • Super League</div>
+            <div class="team"><span class="team-logo"></span> Persib Bandung</div>
+            <div class="team"><span class="team-logo"></span> PSIM Yogyakarta</div>
+        </div>
+        <div class="score-cell">19.00</div>
+    </div>
+
+</div>
+
+</body>
+</html>
+
+ <!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skor Langsung • GOAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hitam: '#121214',
+                        gelap: '#1b1b1f',
+                        kartu: '#222228',
+                        biru: '#0e83d8',
+                        teks: '#e9e9eb',
+                        abu: '#a0a0a8',
+                    },
+                    fontFamily: { sans: ['Segoe UI', 'Arial', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #0f0f12; }
+        .tab-aktif { border-b: 2px solid #fff; color:#fff; font-semibold; }
+        .tgl-aktif { bg-white/15; ring-1 ring-white/20; }
+    </style>
+</head>
+<body class="bg-hitam text-teks font-sans max-w-lg mx-auto">
+
+<!-- Header Utama -->
+<header class="sticky top-0 z-50 bg-hitam/90 px-4 py-3 border-b border-gray-800">
+    <div class="flex justify-between items-center mb-4">
+        <div class="flex items-center gap-3">
+            <a href="#" class="text-xl"><i class="fa fa-times"></i></a>
+            <a href="#" class="text-xl"><i class="fa fa-chevron-down"></i></a>
+        </div>
+        <div class="flex gap-4 text-lg">
+            <a><i class="fa fa-share-alt"></i></a>
+            <a><i class="fa fa-bookmark-o"></i></a>
+            <a><i class="fa fa-ellipsis-v"></i></a>
+        </div>
+    </div>
+
+    <!-- Baris GOAL -->
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-black italic">GOAL</h1>
+        <div class="flex gap-3 items-center">
+            <button class="bg-biru px-4 py-1.5 rounded-full text-sm flex items-center gap-1">
+                <span class="w-2 h-2 bg-white rounded-full"></span> Live
+            </button>
+            <button class="border border-gray-600 px-3 py-1.5 rounded-full text-sm">
+                <i class="fa fa-ticket"></i> Tiket
+            </button>
+            <span class="text-xl"><i class="fa fa-user-circle-o"></i></span>
+            <span class="text-xl"><i class="fa fa-bars"></i></span>
+        </div>
+    </div>
+
+    <!-- Judul & Pencarian -->
+    <h2 class="text-3xl font-black uppercase mb-4 leading-tight">
+        Skor Langsung<br>Sepakbola, Jadwal & Hasil
+    </h2>
+
+    <div class="relative mb-4">
+        <input type="text" placeholder="Cari pertandingan" 
+               class="w-full bg-kartu rounded-lg py-2.5 pl-10 pr-3 text-sm focus:outline-none">
+        <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-abu"></i>
+        <i class="fa fa-calendar absolute right-3 top-1/2 -translate-y-1/2 text-lg"></i>
+    </div>
+
+    <!-- Filter Live & Tanggal -->
+    <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-biru flex items-center justify-center text-xs">●</span>
+            <span class="text-sm">Live (9)</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="sr-only peer">
+                <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+            </label>
+        </div>
+    </div>
+
+   
+
+    <div class="mt-3 flex items-center gap-2 text-lg">
+        <span>★</span> <span>Favorit (0)</span>
+    </div>
+</header>
+
+<!-- Bagian Klub PERSIB dengan Menu Tambahan -->
+<section class="mt-6 px-4 pb-6 border-b border-gray-800 bg-gradient-to-b from-gray-900/50 to-transparent">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-3xl font-black">PERSIB BANDUNG</h2>
+        <div class="flex items-center gap-3">
+            <span class="text-3xl">🐯⭐⭐⭐⭐⭐</span>
+            <img src="https://upload.wikimedia.org/wikipedia/id/thumb/7/73/Persib_Bandung_logo.svg/100px-Persib_Bandung_logo.svg.png" 
+                 class="w-11 h-11" alt="Logo Persib">
+        </div>
+    </div>
+
+    <!-- Navigasi Utama -->
+    <nav class="flex gap-6 overflow-x-auto text-sm border-b border-gray-700 pb-2 mb-5">
+        <a href="#" class="pb-1 hover:text-white">Tinjauan</a>
+        <a href="#" class="pb-1 hover:text-white">Berita</a>
+        <a href="#" class="pb-1 hover:text-white">Video</a>
+        <a href="#" class="pb-1 tab-aktif">Pertandingan</a>
+        <a href="#" class="pb-1 hover:text-white">Skuad</a>
+        <a href="#" class="pb-1 hover:text-white">Klasemen</a>
+    </nav>
+
+    <!-- ✅ Menu Tambahan Sesuai Permintaan -->
+    <div class="grid grid-cols-3 gap-3 mb-5">
+        <a href="#" class="bg-kartu py-3 px-3 rounded-lg text-center hover:bg-gray-700 transition">
+            <div class="text-xl mb-1">🤝</div>
+            <div class="text-sm font-medium">Pertemuan<br>(H2H)</div>
+        </a>
+        <a href="#" class="bg-kartu py-3 px-3 rounded-lg text-center hover:bg-gray-700 transition">
+            <div class="text-xl mb-1">📊</div>
+            <div class="text-sm font-medium">Statistik<br>Lengkap</div>
+        </a>
+        <a href="#" class="bg-biru py-3 px-3 rounded-lg text-center hover:opacity-90 transition">
+            <div class="text-xl mb-1">🎟️</div>
+            <div class="text-sm font-medium">Beli<br>Tiket</div>
+        </a>
+    </div>
+
+    <!-- Blok Contoh Ringkasan -->
+    <div class="bg-kartu/60 p-4 rounded-xl">
+        <h3 class="font-semibold mb-3">Ringkasan Pertandingan</h3>
+        <p class="text-sm text-abu mb-2">Lihat sejarah pertemuan kedua tim, perbandingan statistik terkini, dan beli tiket menonton secara langsung.</p>
+        <ul class="text-sm text-gray-300 space-y-1">
+            <li>• Pertemuan Lalu: Hasil & catatan kemenangan/imbang/kalah</li>
+            <li>• Statistik: Penguasaan bola, tembakan, pelanggaran</li>
+            <li>• Tiket: Pilih kategori, tempat duduk & bayar aman</li>
+        </ul>
+    </div>
+</section>
+
+</body>
+</html>
 
