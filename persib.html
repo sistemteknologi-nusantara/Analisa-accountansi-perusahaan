@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persija vs Persib • 12 September 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(25, 118, 210, 0.8), transparent 35%),
+                radial-gradient(circle at top right, rgba(198, 40, 40, 0.8), transparent 35%),
+                linear-gradient(180deg, #050505 0%, #101010 45%, #080808 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .top-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700, #ff9500);
+            color: #111;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            text-align: center;
+            font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(90deg, #ff4d4d, #ffffff, #4d9bff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .match-info {
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        .match-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            transition: 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.35);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.15);
+        }
+
+        .info-card strong {
+            display: block;
+            color: #91c4ff;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-card span {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .teams {
+            margin-top: 35px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .team {
+            flex: 1;
+            max-width: 260px;
+        }
+
+        .team-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #111;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.45);
+        }
+
+        .team h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .persija h3 {
+            color: #c2185b;
+        }
+
+        .persib h3 {
+            color: #1565c0;
+        }
+
+        .vs {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+
+        .video-section {
+            margin-top: 35px;
+        }
+
+        .video-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .cta-box {
+            margin-top: 30px;
+            text-align: center;
+            padding: 25px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(21, 101, 192, 0.15), rgba(194, 24, 91, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .cta-box h2 {
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .cta-box p {
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1rem;
+            transition: 0.3s ease;
+            background: linear-gradient(135deg, #ffd700, #ff9500);
+            color: #111;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.45);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.65);
+        }
+
+        .note {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #999;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .teams {
+                flex-direction: column;
+            }
+
+            .vs {
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="text-align: center;">
+        <span class="top-badge">Liga 1 • Big Match</span>
+    </div>
+
+    <h1>Persija vs Persib</h1>
+
+    <div class="match-info">
+        <h2>📅 Informasi Pertandingan</h2>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <strong>Tanggal</strong>
+                <span>Sabtu, 12 September 2026</span>
+            </div>
+
+            <div class="info-card">
+                <strong>Waktu</strong>
+                <span>15.30 WIB</span>
+            </div>
+
+            <div class="info-card">
+                <strong>Lokasi</strong>
+                <span>Stadion Utama Gelora Bung Karno</span>
+            </div>
+
+            <div class="info-card">
+                <strong>Siaran</strong>
+                <span>Indosiar & Vidio</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="teams">
+        <div class="team persija">
+            <div class="team-logo">P</div>
+            <h3>Persija Jakarta</h3>
+            <p style="color:#999; font-size:0.9rem;">Macan Kemayoran</p>
+        </div>
+
+        <div class="vs">VS</div>
+
+        <div class="team persib">
+            <div class="team-logo">P</div>
+            <h3>Persib Bandung</h3>
+            <p style="color:#999; font-size:0.9rem;">Maung Bandung</p>
+        </div>
+    </div>
+
+    <div class="video-section">
+        <h2>🎬 Video Sorotan / Siaran</h2>
+
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/46ajhLrfo8g" 
+                title="Persib vs Persija Highlight"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <p class="note">
+            Catatan: Video di atas adalah contoh sorotan pertandingan sebelumnya. 
+            Setelah pertandingan tanggal 12 September 2026 selesai, kamu bisa mengganti ID video YouTube 
+            di bagian <code>src="https://www.youtube.com/embed/ID_VIDEO_BARU"</code> dengan video resmi terbaru.
+        </p>
+    </div>
+
+    <div class="cta-box">
+        <h2>🔵⚪🔴 Tonton Big Match Ini</h2>
+        <p>Saksikan Persija vs Persib secara langsung Sabtu, 12 September 2026 pukul 15.30 WIB.</p>
+        <a class="btn" href="https://www.vidio.com" target="_blank">Buka Vidio</a>
+    </div>
+</div>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport="width=device-width, initial-scale=1.0">
+    <title>PERSIB • Halaman Resmi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gelap: '#121721',
+                        kartu: '#1e2530',
+                        aksen: '#f9e304',
+                        teks: '#e4e6eb',
+                        abu: '#8a8f98',
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .input-style {@apply bg-kartu/60 border border-gray-600 rounded-md px-4 py-3.5 w-full focus:outline-none focus:border-aksen focus:ring-1 focus:ring-aksen/50 text-teks;}
+            .btn-utama {@apply bg-aksen text-gelap font-bold py-3 rounded-md transition-all hover:brightness-110 active:scale-[0.98];}
+            .btn-biasa {@apply bg-gray-300 text-gray-900 font-semibold py-3 rounded-md transition-all hover:bg-gray-200;}
+            .btn-google {@apply border border-gray-500 bg-transparent text-teks py-3 rounded-md flex items-center justify-center gap-3 hover:bg-white/5 transition-all;}
+        }
+    </style>
+</head>
+<body class="bg-gelap text-teks min-h-screen">
+
+<div id="layarSelamat" class="min-h-screen flex flex-col px-6 py-10 max-w-lg mx-auto">
+    <!-- Logo PERSIB BERSIH -->
+    <div class="flex justify-center mb-8 mt-6">
+        <div class="w-28 h-32 flex flex-col items-center justify-center">
+            <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12,20 L108,20 L108,95 C108,130 60,138 60,138 C60,138 12,130 12,95 Z" fill="none" stroke="#f0f0f0" stroke-width="2.5"/>
+                <text x="60" y="52" text-anchor="middle" fill="#f8f8f8" font-weight="bold" font-size="28">PERSIB</text>
+                <path d="M22,60 L98,60 L98,78 L22,78 Z" fill="#2b9442"/>
+                <path d="M22,78 L98,78 L98,96 L22,96 Z M22,96 L98,96 L98,114 L22,114 Z" fill="#111"/>
+                <path d="M16,112 C28,102 44,108 60,116 C76,124 92,118 104,108" stroke="#4a98e9" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <path d="M16,124 C28,114 44,120 60,128 C76,136 92,130 104,120" stroke="#4a98e9" stroke-width="5" fill="none" stroke-linecap="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <h1 class="text-[clamp(2rem,6vw,2.5rem)] font-bold text-white mb-8">Selamat datang!</h1>
+
+    <!-- Fitur-fitur -->
+    <div class="space-y-4 mb-10">
+        <div class="bg-kartu p-4 rounded-lg">
+            <div class="flex gap-4 items-start">
+                <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+                    <i class="fa fa-id-card-o"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-1">Berlangganan MemberSIB atau beli Passport PERSIB</h3>
+                    <p class="text-abu">Nikmati diskon tiket, barang dagangan, undian berhadiah & keuntungan lainnya</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-kartu p-4 rounded-lg">
+            <div class="flex gap-4 items-start">
+                <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+                    <i class="fa fa-tags"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-1">Diskon Tiket & Barang</h3>
+                    <p class="text-abu">Kumpulkan poin untuk diskon di seluruh layanan resmi kami</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-kartu p-4 rounded-lg">
+            <div class="flex gap-4 items-start">
+                <div class="w-14 h-14 rounded-full bg-blue-600 flex items-center justify-center text-xl flex-shrink-0">
+                    <i class="fa fa-gamepad"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-1">Main & Dapatkan Poin!</h3>
+                    <p class="text-abu">Selesaikan tantangan untuk menambah saldo poin akunmu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol -->
+    <div class="mt-auto space-y-3">
+        <button onclick="tampilMasuk()" class="btn-utama w-full">Buat Akun</button>
+        <button class="btn-biasa w-full">Masuk</button>
+        <div class="text-center mt-6">
+            <a href="#" class="text-teks/80 hover:text-white flex items-center justify-center gap-2">
+                Lewati proses Login <i class="fa fa-arrow-right text-sm"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Halaman Masuk (disembunyikan awalnya) -->
+<div id="layarMasuk" class="min-h-screen flex flex-col px-6 py-10 max-w-lg mx-auto hidden">
+    <button onclick="kembali()" class="text-xl self-start mb-6">
+        <i class="fa fa-arrow-left"></i>
+    </button>
+
+    <h2 class="text-3xl font-bold mb-2">MASUK KE AKUN</h2>
+    <h3 class="text-xl mb-8 text-gray-200">PERSIB KAMU</h3>
+
+    <p class="text-gray-300 mb-6">Masukkan alamat surel & kata sandimu untuk masuk ke aplikasi</p>
+
+    <div class="space-y-5">
+        <div>
+            <label class="block mb-2 font-medium">Alamat Email</label>
+            <input type="email" placeholder="Masukkan alamat email" class="input-style">
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium">Kata Sandi</label>
+            <div class="relative">
+                <input type="password" placeholder="Masukkan sandi kamu" class="input-style pr-12">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fa fa-eye-slash"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center text-sm">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" class="w-5 h-5 rounded bg-kartu border-gray-600">
+                <span>Ingat Saya</span>
+            </label>
+            <a href="#" class="text-blue-300 hover:underline">Lupa Kata Sandi?</a>
+        </div>
+
+        <button class="btn-biasa w-full">Masuk</button>
+
+        <div class="flex items-center gap-4 my-2">
+            <hr class="flex-1 border-gray-600">
+            <span class="text-gray-400 text-sm">Atau</span>
+            <hr class="flex-1 border-gray-600">
+        </div>
+
+        <button class="btn-google w-full">
+            <span class="text-xl font-bold">
+                <span class="text-red-500">G</span><span class="text-green-500">o</span><span class="text-yellow-400">o</span><span class="text-blue-400">gle</span>
+            </span>
+            Masuk dengan Google
+        </button>
+
+        <div class="text-center mt-8">
+            <a href="#" class="text-teks/80 hover:text-white">Lewati proses Login →</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function tampilMasuk() {
+    document.getElementById('layarSelamat').classList.add('hidden');
+    document.getElementById('layarMasuk').classList.remove('hidden');
+    window.scrollTo(0,0);
+}
+function kembali() {
+    document.getElementById('layarMasuk').classList.add('hidden');
+    document.getElementById('layarSelamat').classList.remove('hidden');
+}
+</script>
+</body>
+</html>
+
+
