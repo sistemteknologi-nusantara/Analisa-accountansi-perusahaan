@@ -1,2 +1,2 @@
 # Analisa-IT CYBER TGL-perusahaan
-Accountansi perusahaan 
+ORA NGAPAK ORA KEPENAK perusahaan 
