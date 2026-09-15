@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐺 W-Jongen Sparen & Wallet • Sparen Jongen</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Roboto, sans-serif;}
+        :root {
+            --gelap:#0F0F1A; --hitam:#1A1A2E; --biru:#1E40AF; --ungu:#7B61FF;
+            --hijau:#10B981; --merah:#EF4444; --kuning:#F59E0B; --teks:#E5E7EB;
+            --abu:#374151; --biru-muda:#93C5FD; --biru-persib:#2563EB;
+        }
+        body {background:var(--gelap); color:var(--teks); min-height:100vh; padding:15px; padding-bottom:90px;}
+        .wadah {max-width:420px; margin:0 auto;}
+
+        /* ==== ATAS ==== */
+        .baris-atas {display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;}
+        .logo {font-size:22px; font-weight:800; background:linear-gradient(90deg,var(--biru-persib),var(--ungu)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;}
+        .ikon-bundar {width:40px; height:40px; background:var(--hitam); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer;}
+
+        /* ==== KARTU SALDO ==== */
+        .kartu-saldo {background:linear-gradient(135deg,var(--biru),var(--ungu)); border-radius:24px; padding:25px; margin-bottom:20px; box-shadow:0 10px 40px rgba(37,99,235,0.25);}
+        .saldo-label {font-size:13px; color:rgba(255,255,255,0.8); margin-bottom:5px;}
+        .saldo-angka {font-size:36px; font-weight:800;}
+        .alamat-baris {display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.15); padding:10px; border-radius:12px; margin:15px 0;}
+        .alamat-teks {flex:1; font-family:'Courier New',monospace; font-size:11px; color:#E0E7FF; word-break:break-all;}
+        .btn-kecil {background:rgba(255,255,255,0.2); border:none; color:#fff; cursor:pointer; font-size:16px; padding:6px 8px; border-radius:8px;}
+
+        /* ==== TOMBOL UTAMA ==== */
+        .tombol-baris {display:flex; gap:10px; margin-top:5px;}
+        .tombol-bundar {display:flex; flex-direction:column; align-items:center; gap:5px; background:rgba(255,255,255,0.18); border:none; border-radius:14px; padding:12px 6px; color:#fff; font-size:11px; cursor:pointer; flex:1; transition:0.2s;}
+        .tombol-bundar:hover {transform:translateY(-2px); background:rgba(255,255,255,0.28);}
+        .tombol-bundar span {font-size:20px;}
+        .tombol-panjang {background:#fff; color:var(--biru); font-weight:700; font-size:13px;}
+
+        /* ==== PILIHAN KOIN ==== */
+        .kotak-pilih {background:var(--hitam); border-radius:16px; padding:15px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.08);}
+        .pilih {width:100%; padding:12px; background:var(--abu); border:none; border-radius:10px; color:#fff; font-size:14px; margin-bottom:8px;}
+        .info-alamat {font-size:12px; color:var(--biru-muda); margin-top:6px;}
+
+        /* ==== TAB MENU ==== */
+        .tab-menu {display:flex; gap:18px; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:15px; overflow-x:auto; padding-bottom:2px;}
+        .tab-item {padding:10px 0; color:#9CA3AF; cursor:pointer; font-size:14px; white-space:nowrap;}
+        .tab-item.aktif {color:#fff; border-bottom:2px solid var(--biru-persib); font-weight:700;}
+        .isi-tab {display:none;}
+        .isi-tab.aktif {display:block;}
+
+        /* ==== FORM KIRIM ==== */
+        .kartu {background:var(--hitam); border-radius:16px; padding:18px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08);}
+        .label {font-size:13px; color:#9CA3AF; margin:12px 0 5px;}
+        .input {width:100%; padding:13px; background:var(--abu); border:none; border-radius:10px; color:#fff; font-size:15px;}
+        .biaya {font-size:12px; color:var(--kuning); margin:8px 0;}
+        .tombol {width:100%; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:700; cursor:pointer; margin-top:10px;}
+        .tombol.biru {background:linear-gradient(90deg,var(--biru),var(--ungu)); color:#fff;}
+        .tombol.abu {background:#2F3341; color:#6B7280; cursor:not-allowed;}
+        .peringatan {background:rgba(239,68,68,0.1); color:#FECACA; padding:10px; border-radius:8px; font-size:12px; margin:10px 0;}
+
+        /* ==== QR MODAL ==== */
+        .latar-qr {position:fixed; inset:0; background:rgba(0,0,0,0.88); display:none; align-items:center; justify-content:center; z-index:999; padding:20px;}
+        .kotak-qr {background:var(--hitam); border-radius:20px; padding:25px; max-width:340px; width:100%; text-align:center; border:1px solid rgba(255,255,255,0.1);}
+        #qrcode {padding:15px; border-radius:12px; background:#fff; margin:0 auto 12px; display:flex; justify-content:center;}
+        .alamat-salin {background:var(--abu); padding:10px; border-radius:8px; font-size:11px; font-family:monospace; color:var(--biru-muda); word-break:break-all; margin-bottom:12px;}
+        .tombol-tutup {background:var(--merah); color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:5px;}
+        .tombol-kecil-qr {background:var(--biru); color:#fff; border:none; padding:7px 12px; border-radius:8px; font-size:12px; cursor:pointer; margin-left:8px;}
+
+        /* ==== NAV BAWAH ==== */
+        .nav-bawah {position:fixed; bottom:0; left:0; right:0; background:rgba(15,15,26,0.95); backdrop-filter:blur(15px); display:flex; justify-content:space-around; padding:10px 0; border-top:1px solid rgba(255,255,255,0.08);}
+        .nav-bawah button {background:none; border:none; color:#9CA3AF; font-size:11px; text-align:center; cursor:pointer;}
+        .nav-bawah button.aktif {color:var(--biru-JongenSparen);}
+        .nav-bawah button span {display:block; font-size:20px; margin-bottom:2px;}
+
+        .tersembunyi {display:none !important;}
+    </style>
+</head>
+<body>
+
+<div class="wadah">
+    <!-- ==== ATAS ==== -->
+    <div class="baris-atas">
+        <div class="logo"> 🐺J-Sparen • Jongen Sparen </div>
+        <div style="display:flex; gap:10px;">
+            <span class="ikon-bundar" title="Pengaturan">⚙️</span>
+            <span class="ikon-bundar" onclick="keluarAkun()" title="Keluar">🚪</span>
+        </div>
+    </div>
+
+    <!-- === INFO Jongen Sparen=== -->
+    <div class="Invest-Jongen">
+        <div class="nama-tim💸Jongen Sparen</div>
+        <div class="info-stadion">🏟️ Stadion: Gelora Bandung Lautan Api • Kapasitas: ±38.000 penonton</div>
+    </div>
+
+    <!-- ==== KARTU SALDO & ALAMAT ==== -->
+    <div class="kartu-saldo">
+        <p class="saldo-label">Saldo Tersedia</p>
+        <p class="saldo-angka" id="saldoUtama">$0.00</p>
+
+        <p class="saldo-label">Alamat Dompet <span style="font-size:10px; opacity:0.7;">(42 karakter ETH)</span></p>
+        <div class="alamat-baris">
+            <span class="alamat-teks" id="alamatUtama">Sedang dibuat...</span>
+            <button class="btn-kecil" onclick="salinAlamatUtama()" title="Salin"> 🗒</button>
+            <button class="btn-kecil" onclick="tampilkanQRIS('utama')" title="QR">📲</button>
+        </div>
+
+        <div class="tombol-baris">
+            <button class="tombol-bundar" onclick="bukaTab('setor')"><span>📷</span> Terima</button>
+            <button class="tombol-bundar" onclick="buatAlamatBaru()"><span>🔑</span> Alamat Baru</button>
+            <button class="tombol-bundar tombol-panjang" onclick="bukaTab('setor')"><span>⬇</span> Setor</button>
+            <button class="tombol-bundar" onclick="bukaTab('kirim')"><span>⬆</span> Kirim</button>
+        </div>
+    </div>
+
+    <!-- ==== TAB MENU ==== -->
+    <div class="tab-menu">
+        <span class="tab-item" onclick="gantiTab('dompet')">💳 Dompet</span>
+        <span class="tab-item" onclick="gantiTab('riwayat')"> Riwayat</span>
+    </div>
+
+    <!-- ==== TAB: DOMPET ==== -->
+    <div id="tab-dompet" class="isi-tab">
+        <div class="kotak-pilih">
+            <p style="font-size:13px; color:#9CA3AF; margin-bottom:8px;">Pilih Jaringan & Koin</p>
+            <select class="pilih" id="jenisKoin" onchange="buatAlamatBaru(); tampilkanInfoAlamat();">
+                <option value="ETH-USDT">🔵 USDT • Ethereum (ERC20)</option>
+                <option value="ETH-USDC">🔵 USDC • Ethereum (ERC20)</option>
+                <option value="BTC">🟡 Bitcoin (BTC)</option>
+                <option value="SOL-USDT">🟣 USDT • Solana</option>
+                <option value="SOL-USDC">🟣 USDC • Solana</option>
+            </select>
+            <p class="info-alamat" id="infoAlamat">Alamat: 0x + 40 karakter = 42 karakter</p>
+        </div>
+
+        <!-- HALAMAN SETOR -->
+        <div id="halaman-setor" class="kartu">
+            <h3 style="margin-bottom:12px;">⬇ Terima Dana</h3>
+            <p class="label">Alamat Setor Lengkap</p>
+            <div class="alamat-baris" style="background:rgba(16,185,129,0.15);">
+                <span class="alamat-teks" id="alamatSetor">Tekan "Alamat Baru" dulu 👆</span>
+                <button class="btn-kecil" onclick="salinAlamat('setor')">📋</button>
+                <button class="btn-kecil" onclick="tampilkanQRIS('setor')">📲</button>
+            </div>
+            <p class="label">Jumlah Setor</p>
+            <input type="number" step="any" class="input" id="jumlahSetor" placeholder="Masukkan jumlah">
+            <div class="biaya">Biaya Jaringan 5% = <span id="biayaSetor">$0.00</span><br>Masuk Saldo = <span id="hasilMasuk">$0.00</span></div>
+            <div class="peringatan">✅ Alamat Ethereum = <b>42 karakter</b> (0x + 40 huruf/angka)<br>⚠️ Salah jaringan = dana tidak bisa kembali!</div>
+            <button class="tombol biru" id="btnKonfirmasiSetor" onclick="konfirmasiSetor()">✅ Konfirmasi Setor</button>
+        </div>
+
+        <!-- HALAMAN KIRIM KE APLIKASI LAIN -->
+        <div id="halaman-kirim" class="kartu" style="display:none;">
+            <h3 style="margin-bottom:12px;">⬆ Kirim Ke Dompet Lain</h3>
+            <p class="label">Alamat Tujuan <span style="color:var(--merah);">*(wajib 42 karakter untuk ETH)</span></p>
+            <div class="alamat-baris" style="background:rgba(239,68,68,0.1);">
+                <input type="text" class="input" id="alamatTujuan" placeholder="0x________________________________________" style="background:transparent; border:none; margin:0; padding:0; color:#fff;">
+                <button class="tombol-kecil-qris" onclick="unggahQR()">📷 Pindai</button>
+            </div>
+            <p class="label">Jaringan Tujuan</p>
+            <select class="pilih" id="jaringanTujuan">
+                <option value="ETH" selected>Ethereum (ERC20) — Alamat 42 karakter</option>
+                <option value="BTC">Bitcoin (BTC)</option>
+                <option value="SOL">Solana</option>
+            </select>
+            <p class="label">Jumlah Kirim</p>
+            <input type="number" step="any" class="input" id="jumlahKirim" placeholder="Masukkan jumlah">
+            <div class="biaya">Biaya 5% = <span id="biayaKirim">$0.00</span><br>Total Dipotong = <span id="totalPotong">$0.00</span></div>
+            <div class="peringatan">⚠️ Pastikan alamat & jaringan sama persis!<br>✅ Kirim ke dompet lain: masukkan alamat 42 karakter → konfirmasi → dana pindah!</div>
+            <button class="tombol biru" id="btnKonfirmasiKirim" onclick="konfirmasiKirim()">✅ Kirim Sekarang</button>
+        </div>
+    </div>
+
+    <!-- ==== TAB: RIWAYAT ==== -->
+    <div id="tab-riwayat" class="isi-tab">
+        <div class="kartu">
+            <p style="text-align:center; color:#9CA3AF; padding:20px;">Riwayat Transaksi</p>
+            <div id="daftarRiwayat" style="font-size:13px; line-height:1.8;">
+                <p style="color:#6B7280; text-align:center;">Belum ada riwayat transaksi</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==== MODAL QR CODE ==== -->
+<div class="latar-qr" id="modalQR" onclick="if(event.target===this) tutupQR();">
+    <div class="kotak-qr">
+        <p style="font-size:17px; font-weight:700; margin-bottom:5px;">📲 Kode QR Alamat</p>
+        <p style="font-size:12px; color:#9CA3AF; margin-bottom:15px;">Pindai untuk salin alamat lengkap</p>
+        <div id="qrcode"></div>
+        <div class="alamat-salin" id="teksQR"></div>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="tombol biru" onclick="salinDariQR()">📋 Salin Alamat</button>
+            <button class="tombol-tutup" onclick="tutupQR()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==== NAV BAWAH ==== -->
+<div class="nav-bawah">
+    <button class="aktif" onclick="gantiTab('harian')"><span>🔵</span> Bitcoin Nyong </button>
+    <button onclick="bukaTab('setor')"><span>⬇</span> Terima</button>
+    <button onclick="bukaTab('kirim')"><span>⬆</span> Kirim</button>
+    <button onclick="gantiTab('dompet')"><span>💰</span> Dompet</button>
+</div>
+
+<script>
+// ==========================================
+// ⚙️ PENGATURAN UTAMA
+// ==========================================
+const BIAYA = 5;
+const MINIMAL = 5;
+let saldo = 0;
+let alamat = { utama:'', setor:'' };
+let sumberQR = '';
+let riwayat = [];
+
+// ==========================================
+// ✅ BUAT ALAMAT 42 KARAKTER (0x + 40) ETH
+// ==========================================
+function buatAlamatETH() {
+    const c = '0123456789abcdef';
+    let a = '0x';
+    for(let i=0; i<40; i++) a += c[Math.floor(Math.random()*16)];
+    return a;
+}
+function buatAlamatBTC() {
+    const aw = ['1','3','bc1'][Math.floor(Math.random()*3)];
+    const c = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let s = aw;
+    const p = aw==='bc1' ? 62 : 34;
+    for(let i=s.length; i<p; i++) s += c[Math.floor(Math.random()*58)];
+    return s;
+}
+function buatAlamatSOL() {
+    const c = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    let s = '';
+    for(let i=0; i<43; i++) s += c[Math.floor(Math.random()*58)];
+    return s;
+}
+
+// ==========================================
+// 🚀 SAAT PERTAMA DIBUKA
+// ==========================================
+window.onload = function() {
+    alamat.utama = buatAlamatETH();
+    document.getElementById('alamatUtama').textContent = alamat.utama;
+    buatAlamatBaru()
+    tampilkanSaldo();
+};
+
+// ==========================================
+// 🔗 INFORMASI ALAMAT
+// ==========================================
+function tampilkanInfoAlamat() {
+    const j = document.getElementById('jenisKoin').value;
+    let ket = '';
+    if(j.startsWith('ETH')) ket = 'Alamat: 0x + 40 karakter = 42 karakter (Ethereum/ERC20)';
+    else if(j.startsWith('BTC')) ket = 'Alamat: awalan 1 / 3 / bc1';
+    else ket = 'Alamat: 43 karakter (Solana)';
+    document.getElementById('infoAlamat').textContent = ket;
+}
+ ==========================================
+// 📋 BUAT ALAMAT BARU
+// ==========================================
+function buatAlamatBaru() {
+    const j = document.getElementById('jenisKoin').value;
+    if(j.startsWith('ETH')) alamat.setor = buatAlamatETH();
+    else if(j.startsWith('BTC')) alamat.setor = buatAlamatBTC();
+    else alamat.setor = buatAlamatSOL();
+    document.getElementById('alamatSetor').textContent = alamat.setor;
+    hitungBiayaSetor();
+}
+
+// ==========================================
+// 💰 SALDO & BIAYA
+// ==========================================
+function tampilkanSaldo() {
+    document.getElementById('saldoUtama').textContent = '$' + saldo.toFixed(2);
+}
+function hitungBiayaSetor() {
+    const j = parseFloat(document.getElementById('jumlahSetor').value)||0;
+    const b = j * BIAYA / 100;
+    document.getElementById('biayaSetor').textContent = '$' + b.toFixed(4);
+    document.getElementById('hasilMasuk').textContent = '$' + (j-b).toFixed(4);
+    const btn = document.getElementById('btnKonfirmasiSetor');
+    btn.classList.toggle('abu', !(j>=MINIMAL));
+    btn.disabled = !(j>=MINIMAL);
+}
+function hitungBiayaKirim() {
+    const j = parseFloat(document.getElementById('jumlahKirim').value)||0;
+    const b = j * BIAYA / 100;
+    document.getElementById('biayaKirim').textContent = '$' + b.toFixed(4);
+    document.getElementById('totalPotong').textContent = '$' + (j+b).toFixed(4);
+}
+
+// ==========================================
+// ✅ SETOR MASUK
+// ==========================================
+function konfirmasiSetor() {
+    const j = parseFloat(document.getElementById('jumlahSetor').value)||0;
+    if(j < MINIMAL) return alert(`❌ Minimal setor: ${MINIMAL} unit`);
+    const b = j * BIAYA / 100;
+    const masuk = j - b;
+    saldo += masuk;
+    riwayat.unshift({ jenis:'Setor', jml:j, biaya:b, waktu:new Date().toLocaleString() });
+    alert(`✅ Setor Berhasil!\nJumlah: ${j}\nBiaya 5%: ${b.toFixed(4)}\nMasuk Saldo: ${masuk.toFixed(4)}`);
+    document.getElementById('jumlahSetor').value='';
+    tampilkanSaldo(); hitungBiayaSetor(); tampilkanRiwayat();
+}
+
+// ==========================================
+// ✅ KIRIM KE APLIKASI LAIN (42 KARAKTER)
+// ==========================================
+function konfirmasiKirim() {
+    const j = parseFloat(document.getElementById('jumlahKirim').value)||0;
+    const tujuan = document.getElementById('alamatTujuan').value.trim();
+    const jaringan = document.getElementById('jaringanTujuan').value;
+    const b = j * BIAYA / 100;
+    const total = j + b;
+
+    if(jaringan==='ETH') {
+        if(!tujuan.startsWith('0x') || tujuan.length!==42) {
+            return alert(`❌ Alamat Ethereum harus 42 karakter!\nFormat: 0x + 40 huruf/angka\nJumlah sekarang: ${tujuan.length} karakter`);
+        }
+    }
+    if(j<=0 || !tujuan) return alert('❌ Lengkapi semua data!');
+    if(total > saldo) return alert(`❌ Saldo tidak cukup!\nDibutuhkan: ${total.toFixed(4)}`);
+    if(!confirm(`Kirim ${j}\nKe: ${tujuan.slice(0,14)}...\nJaringan: ${jaringan}\nBiaya: ${b.toFixed(4)}\nTotal: ${total.toFixed(4)}\n\nYakin kirim?`)) return;
+
+    saldo -= total;
+    riwayat.unshift({ jenis:'Kirim Keluar', jml:j, ke:tujuan.slice(0,12)+'...', waktu:new Date().toLocaleString() });
+    alert(`✅ Berhasil Dikirim!\nSisa saldo: ${saldo.toFixed(4)}`);
+    document.getElementById('jumlahKirim').value='';
+    document.getElementById('alamatTujuan').value='';
+    tampilkanSaldo(); tampilkanRiwayat();
+}
+
+// ==========================================
+// 📋 RIWAYAT
+// ==========================================
+function tampilkanRiwayat() {
+    let html = '';
+    if(riwayat.length===0) html = '<p style="color:#6B7280; text-align:center;">Belum ada riwayat</p>';
+    else riwayat.forEach(r=>{
+        html += `<p>✅ ${r.jenis} • ${r.jml} • ${r.waktu}</p>`;
+    });
+    document.getElementById('daftarRiwayat').innerHTML = html;
+}
+
+// ==========================================
+// 🔀 PENGALIHAN HALAMAN
+// ==========================================
+function gantiTab(nama) {
+    document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('aktif'));
+    event.target.classList.add('aktif');
+    document.querySelectorAll('.isi-tab').forEach(i=>i.classList.remove('aktif'));
+    document.getElementById(`tab-${nama}`).classList.add('aktif');
+}
+function bukaTab(hal) {
+    gantiTab('dompet');
+    document.getElementById('halaman-setor').style.display='none';
+    document.getElementById('halaman-kirim').style.display='none';
+    if(hal==='setor') { document.getElementById('halaman-setor').style.display='block'; buatAlamatBaru(); }
+    else { document.getElementById('halaman-kirim').style.display='block'; }
+}
+
+// ==========================================
+// 📲 QR & SALIN
+// ==========================================
+function tampilkanQRIS(jenis) {
+    const al = jenis==='utama' ? alamat.utama : alamat.setor;
+    if(!al) return alert('❌ Alamat belum dibuat!');
+    sumberQR = al;
+    document.getElementById('teksQR').textContent = al;
+    document.getElementById('qrcode').innerHTML = '';
+    new QRCode(document.getElementById('qrcode'), { text:al, width:200, height:200 });
+    document.getElementById('modalQR').style.display = 'flex';
+}
+function tutupQR() { document.getElementById('modalQR').style.display='none'; document.getElementById('qrcode').innerHTML=''; }
+async function salinDariQR() { if(!sumberQR) return; await navigator.clipboard.writeText(sumberQR); alert('✅ Disalin!'); tutupQR(); }
+async function salinAlamatUtama() { await navigator.clipboard.writeText(alamat.utama); alert('✅ Disalin!'); }
+async function salinAlamat(jenis) { await navigator.clipboard.writeText(alamat[jenis]); alert('✅ Disalin!'); }
+function unggahQR() { alert('📷 Arahkan kamera ke kode QR alamat tujuan'); }
+function keluarAkun() { if(confirm('Keluar?')) alert('✅ Berhasil keluar'); }
+
+// Hitung otomatis saat ketik
+document.addEventListener('input', e=>{
+    if(e.target.id==='jumlahSetor') hitungBiayaSetor();
+    if(e.target.id==='jumlahKirim') hitungBiayaKirim();
+});
+</script>
+</body>
+</html>
