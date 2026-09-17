@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🛡️ Alat Panduan Lengkap • Overlay Layar Penuh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; outline:none; -webkit-tap-highlight-color:transparent; user-select:none;}
+        html, body {
+            position:fixed; inset:0; width:100%; height:100%; overflow:hidden;
+            background:transparent; font-family:'Segoe UI', Roboto, sans-serif;
+            color:#e5e7eb;
+        }
+        /* SVG Utama: TEMBUS SENTUHAN & LATAR */
+        #papanUtama {
+            position:absolute; inset:0; width:100%; height:100%; background:transparent;
+            pointer-events:none; z-index:10;
+        }
+        svg * {pointer-events:none;}
+
+        /* Panel Kontrol Mengambang/Ringkas */
+        .panel-atas {
+            position:fixed; top:8px; left:50%; transform:translateX(-50%); z-index:50;
+            background:rgba(15,23,42,0.75); backdrop-filter:blur(10px);
+            border:1px solid rgba(148,163,184,.25); border-radius:16px; padding:8px 10px;
+            display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:center;
+            max-width:96vw; transition:.3s;
+        }
+        .panel-atas.ciut {padding:4px 8px; border-radius:20px; background:rgba(15,23,42,.6);}
+        .tombol {
+            font-size:11px; padding:6px 9px; border-radius:9px; border:none; font-weight:600;
+            cursor:pointer; transition:.2s; display:inline-flex; align-items:center; gap:4px;
+        }
+        .tombol.on {background:#16a34a; color:#fff; box-shadow:0 2px 8px rgba(22,163,74,.35);}
+        .tombol.off {background:rgba(71,85,105,.6); color:#e2e8f0;}
+        .tombol.akcent {background:#2563eb; color:#fff;}
+        .tombol.merah {background:#dc2626; color:#fff;}
+
+        /* Info Pengukur Bawah */
+        .panel-info {
+            position:fixed; bottom:10px; left:50%; transform:translateX(-50%); z-index:50;
+            background:rgba(0,0,0,.65); backdrop-filter:blur(8px);
+            border-radius:12px; padding:8px 14px; font-family:ui-monospace,monospace;
+            font-size:12px; line-height:1.5; text-align:center; color:#d1d5db;
+            min-width:260px;
+        }
+        .panel-info b {color:#86efac; margin:0 4px;}
+
+        /* Pengaturan Samping */
+        .samping {
+            position:fixed; top:50%; left:10px; transform:translateY(-50%); z-index:50;
+            background:rgba(15,23,42,.7); backdrop-filter:blur(8px);
+            border:1px solid rgba(148,163,184,.2); border-radius:14px; padding:10px;
+            display:flex; flex-direction:column; gap:9px; font-size:11px;
+        }
+        .samping label {display:flex; justify-content:space-between; gap:8px; align-items:center; color:#cbd5e1;}
+        .samping input[type="range"] {width:80px;}
+        .samping input[type="color"] {width:28px; height:24px; border:none; border-radius:6px; cursor:pointer; background:transparent;}
+        .label-kecil {font-size:10px; opacity:.75; margin-bottom:-4px;}
+
+        .tombol-sembunyi {position:fixed; top:10px; right:12px; z-index:60;}
+        .tersembunyi {opacity:0; pointer-events:none; transition:.3s;}
+    </style>
+</head>
+<body>
+
+<svg id="papanUtama" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+        <filter id="cahayaLembut" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.2"/>
+            <feMerge><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="ujahAnak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#22c55e"/>
+        </marker>
+        <pattern id="kisi" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+        </pattern>
+    </defs>
+</svg>
+
+<div class="panel-atas" id="panelAtas">
+    <button class="tombol on" id="btnGaris" onclick="setAlat('garis')">📏 Garis</button>
+    <button class="tombol off" id="btnLingkaran" onclick="setAlat('lingkaran')">⭕ Bulat</button>
+    <button class="tombol off" id="btnPantul" onclick="setAlat('pantulan')">↩️ Pantul</button>
+    <button class="tombol akcent" onclick="hapusSemua()">🗑️ Bersih</button>
+    <button class="tombol akcent" onclick="titikTengah()">➕ Pusat</button>
+    <button class="tombol merah" onclick="simpanBeban()">💾</button>
+</div>
+<button class="tombol tombol-sembunyi akcent" id="btnCiut" onclick="bukaTutupPanel()">−</button>
+
+<div class="samping" id="pengaturan">
+    <div class="label-kecil">Gaya Garis</div>
+    <label>Warna: <input type="color" id="wrna" value="#22c55e"></label>
+    <label>Tebal: <input type="range" id="tebal" min="1" max="6" value="2"></label>
+    <label>Transparan: <input type="range" id="alfa" min="0.2" max="1" step="0.05" value="0.95"></label>
+    <label>Gaya: 
+        <select id="gaya" class="bg-slate-700 text-white text-xs rounded px-1">
+            <option value="solid">Penuh</option>
+            <option value="putus">Putus</option>
+            <option value="titik">Titik</option>
+        </select>
+    </label>
+</div>
+
+<div class="panel-info" id="infoLayar">
+    Posisi: <b>X=0 Y=0</b> | Sudut: <b>0°</b> | Panjang: <b>0</b>px<br>
+    Jarak Nyata: <b>0</b> | Alat: <i id="jenisAlat">Garis Lurus</i>
+</div>
+
+<script>
+// === KESELURUHAN STATUS ===
+const svg = document.getElementById('papanUtama');
+const keadaan = {
+    alat:'garis', sedangGambar:false, titikMulai:null, elemenSementara:null,
+    pengaturan:{warna:'#22c55e', tebal:2, alfa:0.95, gaya:'solid'}
+};
+
+function posisiSvg(e) {
+    const rect = svg.getBoundingClientRect();
+    let x, y;
+    if (e.touches?.length) {x=e.touches[0].clientX - rect.left; y=e.touches[0].clientY - rect.top;}
+    else {x=e.clientX - rect.left; y=e.clientY - rect.top;}
+    return {x,y};
+}
+
+function getGayaGaris() {
+    const g = keadaan.pengaturan.gaya;
+    if(g==='putus') return '6,4'; if(g==='titik') return '2,4'; return 'none';
+}
+
+// === PEMBUAT BENTUK ===
+function buatGaris(a,b,opt={}) {
+    const el = document.createElementNS(svg.namespaceURI,'line');
+    el.setAttribute('x1',a.x); el.setAttribute('y1',a.y);
+    el.setAttribute('x2',b.x); el.setAttribute('y2',b.y);
+    el.setAttribute('stroke',opt.warna||keadaan.pengaturan.warna);
+    el.setAttribute('stroke-width',opt.tebal||keadaan.pengaturan.tebal);
+    el.setAttribute('stroke-opacity',opt.alfa||keadaan.pengaturan.alfa);
+    el.setAttribute('stroke-dasharray',opt.gaya||getGayaGaris());
+    el.setAttribute('filter','url(#cahayaLembut)');
+    return el;
+}
+function buatLingkaran(pusat,jari,opt={}) {
+    const el = document.createElementNS(svg.namespaceURI,'circle');
+    el.setAttribute('cx',pusat.x); el.setAttribute('cy',pusat.y); el.setAttribute('r',jari);
+    el.setAttribute('fill','transparent'); el.setAttribute('stroke',opt.warna||keadaan.pengaturan.warna);
+    el.setAttribute('stroke-width','1.5'); el.setAttribute('stroke-opacity','0.65');
+    return el;
+}
+function buatPantulan(a,b) {
+    const dx=b.x-a.x, dy=b.y-a.y;
+    const norm = Math.hypot(dx,dy)||1;
+    const pantul = {x: b.x + dx/norm*250, y: b.y + dy/norm*250};
+    const g1=buatGaris(a,b), g2=buatGaris(b,pantul,{warna:'#f97316',gaya:'8,6'});
+    return [g1,g2];
+}
+
+// === PERISTIWA SENTUH/KLIK ===
+["mousedown","touchstart"].forEach(ev=>document.addEventListener(ev, mulaiGambar, {passive:false}));
+["mousemove","touchmove"].forEach(ev=>document.addEventListener(ev, berjalanGambar, {passive:false}));
+["mouseup","touchend","mouseout"].forEach(ev=>document.addEventListener(ev, selesaiGambar, {passive:true}));
+
+function mulaiGambar(e) {
+    e.preventDefault(); if(keadaan.sedangGambar) return;
+    keadaan.sedangGambar=true; keadaan.titikMulai=posisiSvg(e); keadaan.elemenSementara=null;
+}
+function berjalanGambar(e) {
+    if(!keadaan.sedangGambar) return; e.preventDefault();
+    const pos = posisiSvg(e), asli = keadaan.titikMulai;
+    const dx=pos.x-asli.x, dy=pos.y-asli.y;
+    const sudut = Math.round(Math.atan2(dy,dx)*180/Math.PI);
+    const jarak = Math.hypot(dx,dy).toFixed(1);
+    document.getElementById('infoLayar').innerHTML =
+        `Posisi: <b>X=${pos.x.toFixed(0)} Y=${pos.y.toFixed(0)}</b> | Sudut: <b>${sudut}°</b> | Panjang: <b>${jarak}</b>px<br>Jarak Nyata: <b>${jarak}</b> | Alat: <i>${keadaan.alat}</i>`;
+
+    if(keadaan.elemenSementara) keadaan.elemenSementara.remove();
+    if(keadaan.alat==='garis') keadaan.elemenSementara=buatGaris(asli,pos);
+    if(keadaan.alat==='lingkaran') keadaan.elemenSementara=buatLingkaran({x:(asli.x+pos.x)/2,y:(asli.y+pos.y)/2}, jarak/2);
+    if(keadaan.alat==='pantulan') {
+        const r = buatPantulan(asli,pos); keadaan.elemenSementara=document.createElement('g');
+        r.forEach(x=>keadaan.elemenSementara.appendChild(x));
+    }
+    if(keadaan.elemenSementara) svg.appendChild(keadaan.elemenSementara);
+}
+function selesaiGambar() {keadaan.sedangGambar=false; keadaan.elemenSementara=null;}
+
+// === TOMBOL & PENGATURAN ===
+function setAlat(nama) {
+    keadaan.alat=nama; ['Garis','Lingkaran','Pantul'].forEach(n=>{
+        document.getElementById(`btn${n}`).className=`tombol ${nama===n.toLowerCase()?'on':'off'}`;
+    });
+}
+function hapusSemua() { const defs = svg.querySelector('defs').outerHTML; svg.innerHTML=defs;}
+function titikTengah() {
+    const w=window.innerWidth/2, h=window.innerHeight/2;
+    const t1=buatGaris({x:w-20,y:h},{x:w+20,y:h},{warna:'#ef4444',tebal:1.5});
+    const t2=buatGaris({x:w,y:h-20},{x:w,y:h+20},{warna:'#ef4444',tebal:1.5});
+    svg.append(t1,t2);
+}
+function bukaTutupPanel() {
+    document.querySelectorAll('.panel-atas,.samping,.panel-info').forEach(el=>el.classList.toggle('tersembunyi'));
+    document.getElementById('panelAtas').classList.toggle('ciut');
+}
+function simpanBeban() {
+    localStorage.setItem('petaGambar',svg.innerHTML);
+    localStorage.setItem('pengaturanAlat',JSON.stringify(keadaan.pengaturan));
+    alert('✅ Disimpan! Buka ulang halaman nanti kembali otomatis');
+}
+window.onload=()=>{
+    if(localStorage.petaGambar) svg.innerHTML=localStorage.petaGambar;
+    if(localStorage.pengaturanAlat) {
+        const o=JSON.parse(localStorage.pengaturanAlat);
+        Object.assign(keadaan.pengaturan,o);
+        document.getElementById('wrna').value=o.warna; document.getElementById('tebal').value=o.tebal;
+        document.getElementById('alfa').value=o.alfa; document.getElementById('gaya').value=o.gaya;
+    }
+    ['wrna','tebal','alfa','gaya'].forEach(id=>document.getElementById(id).addEventListener('input',e=>{
+        const v=e.target.value; const kunci=id==='wrna'?'warna':id==='tebal'?'tebal':id==='alfa'?'alfa':'gaya';
+        if(id==='tebal'||id==='alfa') keadaan.pengaturan[kunci]=parseFloat(v);
+        else keadaan.pengaturan[kunci]=v;
+    }));
+}
+</script>
+</body>
+</html>
