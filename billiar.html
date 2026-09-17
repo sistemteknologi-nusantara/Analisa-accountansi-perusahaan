@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🔰 Panduan Biliar Penuh Layar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {margin:0; padding:0; border:0; box-sizing:border-box; outline:none; -webkit-tap-highlight-color:transparent; user-select:none;}
+        html, body {
+            position:fixed;
+            top:0; left:0;
+            width:100vw; height:100vh;
+            background:transparent !important; /* LATAR BENING PENUH */
+            overflow:hidden;
+            font-family:system-ui, sans-serif;
+        }
+        /* SVG PENUH LAYAR & TEMBUS SENTUHAN */
+        #layarPapan {
+            position:absolute;
+            inset:0;
+            width:100%; height:100%;
+            background:transparent !important;
+            pointer-events:none;
+            z-index:5;
+        }
+        svg * {pointer-events:none;}
+
+        /* Panel Mengambang Ringkas */
+        .panel-kontrol {
+            position:fixed;
+            top:12px; left:50%; transform:translateX(-50%);
+            z-index:20;
+            background:rgba(10,15,25,0.65);
+            backdrop-filter:blur(8px);
+            border-radius:16px;
+            padding:8px 12px;
+            display:flex; gap:6px; flex-wrap:wrap; justify-content:center;
+            max-width:94vw;
+            transition:.25s;
+        }
+        .panel-sembunyi {opacity:0; pointer-events:none; transform:translateX(-50%) translateY(-10px);}
+
+        .tombol {
+            font-size:12px; padding:7px 12px; border-radius:10px; border:none; font-weight:bold; cursor:pointer;
+        }
+        .tombol-aktif {background:#22c55e; color:white;}
+        .tombol-biasa {background:rgba(100,116,139,.5); color:#fff;}
+        .tombol-sembunyi {position:fixed; top:10px; right:10px; z-index:25; width:36px; height:36px; border-radius:50%; border:none; background:#2563eb; color:white; font-weight:bold;}
+
+        .panel-pengaturan {
+            position:fixed; top:50%; left:10px; transform:translateY(-50%); z-index:20;
+            background:rgba(15,23,42,.65); backdrop-filter:blur(8px); border-radius:14px; padding:10px; font-size:11px;
+            display:flex; flex-direction:column; gap:8px;
+        }
+        .pengaturan-sembunyi {display:none !important;}
+
+        .panel-info {
+            position:fixed; bottom:12px; left:50%; transform:translateX(-50%); z-index:20;
+            background:rgba(0,0,0,.55); backdrop-filter:blur(6px); border-radius:12px; padding:8px 16px;
+            font-family:monospace; font-size:12px; color:#e5e7eb;
+        }
+        .info-sembunyi {opacity:0;}
+    </style>
+</head>
+<body>
+
+<svg id="layarPapan" preserveAspectRatio="none">
+    <defs>
+        <filter id="cahaya">
+            <feGaussianBlur stdDeviation="1"/>
+        </filter>
+    </defs>
+</svg>
+
+<div class="panel-kontrol" id="panelUtama">
+    <button class="tombol tombol-aktif" onclick="setAlat('garis')">📏 Garis</button>
+    <button class="tombol tombol-biasa" onclick="setAlat('lingkaran')">⭕ Bulat</button>
+    <button class="tombol tombol-biasa" onclick="setAlat('pantul')">↩️ Pantul</button>
+    <button class="tombol tombol-biasa" style="background:#b91c1c" onclick="bersihkanSemua()">🗑️</button>
+</div>
+<button class="tombol tombol-sembunyi" id="btnTutup" onclick="sembunyiTampil()">−</button>
+
+<div class="panel-pengaturan" id="panelPengaturan">
+    <label style="color:#cbd5e1">Warna:<br><input type="color" id="wrna" value="#22c55e" style="width:100%"></label>
+    <label style="color:#cbd5e1">Tebal:<br><input type="range" id="tebal" min="1" max="5" value="2"></label>
+    <label style="color:#cbd5e1">Tembus:<br><input type="range" id="trans" min="0.2" max="1" step="0.05" value="0.9"></label>
+</div>
+
+<div class="panel-info" id="panelInfo">Posisi: <b>0,0</b> | Sudut:<b>0°</b></div>
+
+<script>
+const svg = document.getElementById('layarPapan');
+let status = {alat:'garis', sedang:false, mulai:null, garisSementara:null};
+let opt = {warna:'#22c55e', tebal:2, alfa:0.9};
+
+function posisi(e) {
+    const r = svg.getBoundingClientRect();
+    let x,y;
+    if(e.touches){x=e.touches[0].clientX-r.left; y=e.touches[0].clientY-r.top;}
+    else {x=e.clientX-r.left; y=e.clientY-r.top;}
+    return {x,y};
+}
+
+function buatGaris(a,b){
+    const g=document.createElementNS(svg.namespaceURI,'line');
+    g.setAttribute('x1',a.x); g.setAttribute('y1',a.y);
+    g.setAttribute('x2',b.x); g.setAttribute('y2',b.y);
+    g.setAttribute('stroke',opt.warna);
+    g.setAttribute('stroke-width',opt.tebal);
+    g.setAttribute('stroke-opacity',opt.alfa);
+    g.setAttribute('stroke-linecap','round');
+    return g;
+}
+
+// Peristiwa sentuh/gerak
+document.addEventListener('touchstart', mulai, {passive:false});
+document.addEventListener('mousedown', mulai);
+document.addEventListener('touchmove', jalan, {passive:false});
+document.addEventListener('mousemove', jalan);
+document.addEventListener('touchend', selesai);
+document.addEventListener('mouseup', selesai);
+
+function mulai(e){
+    e.preventDefault(); status.sedang=true; status.mulai=posisi(e);
+}
+function jalan(e){
+    if(!status.sedang) return; e.preventDefault();
+    const p=posisi(e), a=status.mulai;
+    if(status.garisSementara) status.garisSementara.remove();
+    status.garisSementara=buatGaris(a,p);
+    svg.appendChild(status.garisSementara);
+    // Tampil info
+    document.getElementById('panelInfo').innerHTML=
+        `X:${p.x.toFixed(0)} Y:${p.y.toFixed(0)} | Sudut: ${Math.round(Math.atan2(p.y-a.y,p.x-a.x)*180/Math.PI)}°`;
+}
+function selesai(){ status.sedang=false; status.garisSementara=null; }
+
+function setAlat(jns){status.alat=jns;}
+function bersihkanSemua(){svg.innerHTML=`<defs><filter id="cahaya"><feGaussianBlur stdDeviation="1"/></filter></defs>`;}
+
+// SEMBUNYIKAN SEMUA TOMBOL → LAYAR PENUH BERSIH!
+function sembunyiTampil(){
+    document.getElementById('panelUtama').classList.toggle('panel-sembunyi');
+    document.getElementById('panelPengaturan').classList.toggle('pengaturan-sembunyi');
+    document.getElementById('panelInfo').classList.toggle('info-sembunyi');
+}
+
+// Pengaturan berjalan langsung
+["wrna","tebal","trans"].forEach(id=>document.getElementById(id).addEventListener("input",e=>{
+    if(id==="wrna") opt.warna=e.target.value;
+    if(id==="tebal") opt.tebal=parseInt(e.target.value);
+    if(id==="trans") opt.alfa=parseFloat(e.target.value);
+}));
+</script>
+</body>
+</html>
